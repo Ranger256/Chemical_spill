@@ -17,8 +17,8 @@
     <Color x:Key="BorderStrongColor">#B3BCC9</Color>
 
     <Color x:Key="TextPrimaryColor">#1B2330</Color>
-    <Color x:Key="TextSecondaryColor">#5A6473</Color>
-    <Color x:Key="TextMutedColor">#8B95A5</Color>
+    <Color x:Key="TextSecondaryColor">#414B59</Color>
+    <Color x:Key="TextMutedColor">#5B6676</Color>
     <Color x:Key="TextInverseColor">#F2F5F9</Color>
 
     <Color x:Key="AccentColor">#1C6EA4</Color>

@@ -33,7 +33,9 @@
             <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
         </Style>
 
-        <Style x:Key="ChromeMenuItem" TargetType="MenuItem">
+        <!-- Заголовок меню на тёмной панели. Пункты внутри берут тёмный цвет
+             из общего стиля MenuItem и остаются читаемыми. -->
+        <Style x:Key="ChromeMenuItem" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
             <Setter Property="Foreground" Value="{StaticResource TextInverseBrush}" />
             <Setter Property="Padding" Value="10,6" />
         </Style>

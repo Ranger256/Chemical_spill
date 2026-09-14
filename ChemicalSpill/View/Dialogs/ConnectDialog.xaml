@@ -7,8 +7,9 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vmd:ConnectViewModel}"
         Title="Подключение к установке"
-        Width="620" Height="580"
-        ResizeMode="NoResize"
+        Width="660" Height="780"
+        MinWidth="560" MinHeight="560"
+        ResizeMode="CanResize"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         FontFamily="{StaticResource UiFont}"
@@ -54,7 +55,10 @@
             </DockPanel>
         </Border>
 
-        <StackPanel>
+        <!-- Содержимое прокручивается: при крупном шрифте три шага и сообщение
+             о состоянии не помещаются в окно фиксированной высоты. -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="0,0,4,0">
             <HeaderedContentControl Style="{StaticResource Card}">
                 <HeaderedContentControl.Header>
                     <TextBlock Text="Шаг 1. Адрес установки" />
@@ -160,5 +164,6 @@
                 </StackPanel>
             </Border>
         </StackPanel>
+        </ScrollViewer>
     </DockPanel>
 </Window>

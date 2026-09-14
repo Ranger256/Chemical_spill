@@ -243,15 +243,18 @@
                         <TextBlock Text="Стадия, ограничивающая производительность" Style="{StaticResource MutedText}" />
                     </DockPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                    <!-- WrapPanel: в узкой колонке кнопки переносятся на вторую строку,
+                         а не выходят за край карточки. -->
+                    <WrapPanel Margin="0,14,0,0">
                         <Button Style="{StaticResource AccentButton}"
                                 Content="Сохранить в рецепт…"
                                 Command="{Binding SaveToRecipeCommand}"
-                                Margin="0,0,6,0" />
+                                Margin="0,0,6,6" />
                         <Button Style="{StaticResource BaseButton}"
                                 Content="Значения по умолчанию"
-                                Command="{Binding ResetToDefaultsCommand}" />
-                    </StackPanel>
+                                Command="{Binding ResetToDefaultsCommand}"
+                                Margin="0,0,0,6" />
+                    </WrapPanel>
                 </StackPanel>
             </HeaderedContentControl>
 

@@ -481,6 +481,21 @@
         <Setter Property="Margin" Value="0,6" />
     </Style>
 
+    <!-- Пункты выпадающих меню. Цвет задаётся явно: иначе он наследуется
+         от светлого заголовка на тёмной панели и на светлом фоне списка
+         текст оказывается нечитаемым. -->
+    <Style TargetType="MenuItem">
+        <Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Padding" Value="8,5" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="#9AA3B0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- ================================================================
          Таблицы
          ================================================================ -->
@@ -514,7 +529,9 @@
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="SelectionMode" Value="Single" />
         <Setter Property="SelectionUnit" Value="FullRow" />
-        <Setter Property="RowHeight" Value="30" />
+        <!-- MinRowHeight вместо RowHeight: строка растёт, если текст в ячейке
+             переносится, и длинное описание не обрезается. -->
+        <Setter Property="MinRowHeight" Value="30" />
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource GridHeader}" />
         <Setter Property="ColumnHeaderHeight" Value="32" />
     </Style>

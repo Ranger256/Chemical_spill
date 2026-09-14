@@ -162,7 +162,18 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Назначение" Binding="{Binding Description}" Width="3*" />
+                        <!-- Назначение переносится по словам и не уходит за край таблицы;
+                             полный текст доступен подсказкой. -->
+                        <DataGridTextColumn Header="Назначение" Binding="{Binding Description}" Width="3*" MinWidth="220">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                    <Setter Property="Margin" Value="0,4,6,4" />
+                                    <Setter Property="ToolTip" Value="{Binding Description}" />
+                                    <Setter Property="ToolTipService.ShowDuration" Value="30000" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </HeaderedContentControl>

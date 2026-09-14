@@ -402,11 +402,12 @@
                                           Visibility="{Binding Mnemonic.IsByVial, Converter={StaticResource BoolToVis}}" />
                             </StackPanel>
 
+                            <!-- Пояснение переносится по словам: обрезка многоточием
+                                 прятала вторую половину подсказки. -->
                             <TextBlock Text="{Binding Mnemonic.ModeHint}"
                                        Style="{StaticResource MutedText}"
                                        VerticalAlignment="Center"
-                                       TextWrapping="NoWrap"
-                                       TextTrimming="CharacterEllipsis"
+                                       TextWrapping="Wrap"
                                        Margin="14,0,0,0" />
                         </DockPanel>
 

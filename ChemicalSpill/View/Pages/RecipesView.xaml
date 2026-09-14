@@ -13,8 +13,22 @@
             <Setter Property="Margin" Value="0,0,10,0" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style x:Key="FieldBox" TargetType="TextBox">
+        <!-- Поле состава рецепта. Для нередактируемых состояний («проверен»,
+             «утверждён», «архивный») поле не отключается, а становится
+             доступным только для чтения: категории по-прежнему листаются,
+             и характеристики рецепта можно просмотреть. -->
+        <Style x:Key="FieldBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Margin" Value="0,2,12,2" />
+            <Setter Property="IsReadOnly"
+                    Value="{Binding DataContext.IsEditable,
+                                    RelativeSource={RelativeSource AncestorType=UserControl},
+                                    Converter={StaticResource InverseBool}}" />
+            <Style.Triggers>
+                <Trigger Property="IsReadOnly" Value="True">
+                    <Setter Property="Background" Value="#F4F6F9" />
+                    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
@@ -158,9 +172,11 @@
                                TextWrapping="Wrap" />
                 </Border>
 
+                <!-- Вкладки доступны всегда: даже утверждённый или архивный рецепт
+                     нужно просматривать по блокам. Запрет правки обеспечивают
+                     поля, доступные только для чтения. -->
                 <TabControl Background="Transparent"
-                            BorderBrush="{StaticResource BorderBrushLight}"
-                            IsEnabled="{Binding IsEditable}">
+                            BorderBrush="{StaticResource BorderBrushLight}">
 
                     <TabItem Header="1. Идентификация">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
