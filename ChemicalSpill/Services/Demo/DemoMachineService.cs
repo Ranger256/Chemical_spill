@@ -23,6 +23,9 @@ namespace ChemicalSpill.Services.Demo
         private double _fillElapsed = 1.8;
         private double _capElapsed = 0.6;
 
+        /// <summary>Имитация невыполненного разрешающего условия — для показа блокировки пуска.</summary>
+        private bool _startBlocked;
+
         public DemoMachineService()
         {
             State = MachineState.Running;
@@ -164,6 +167,8 @@ namespace ChemicalSpill.Services.Demo
 
         public IReadOnlyList<StartCondition> GetStartConditions()
         {
+            bool alarmsClear = !HasUnacknowledgedAlarm();
+
             return new List<StartCondition>
             {
                 Condition("Содержание O₂ и H₂O ниже заданных порогов", true, "O₂ 3,2 ppm; H₂O 1,8 ppm"),
@@ -172,9 +177,60 @@ namespace ChemicalSpill.Services.Demo
                 Condition("Тип установленного ротора подтверждён и соответствует рецепту", true, "РТ-24-20"),
                 Condition("Загружен рецепт, введены номер партии и наименование продукта", true, "Ацетонитрил 20 мл, в. 3"),
                 Condition("В магазине укупорщика есть крышки, во входном накопителе есть флаконы", true, "412 крышек; 186 флаконов"),
-                Condition("Продукт в питающей ёмкости присутствует, температура в допуске", false, "температура продукта 21,8 °C при реперной 20,0 °C — выдержка не завершена"),
-                Condition("Отсутствуют неквитированные аварии, кнопка аварийного останова разблокирована", false, "не квитировано предупреждение W-214")
+                Condition("Продукт в питающей ёмкости присутствует, температура в допуске", !_startBlocked,
+                    _startBlocked
+                        ? "температура продукта 21,8 °C при реперной 20,0 °C — выдержка не завершена"
+                        : "остаток 1840 мл; температура 21,8 °C в допуске 18–24 °C"),
+                Condition("Отсутствуют неквитированные аварии, кнопка аварийной остановки разблокирована", alarmsClear,
+                    alarmsClear ? "аварий нет, кнопка разблокирована" : "есть неквитированная авария")
             };
+        }
+
+        /// <summary>Есть ли неквитированная авария. Предупреждения пуску не препятствуют.</summary>
+        private bool HasUnacknowledgedAlarm()
+        {
+            foreach (var alarm in _alarms)
+            {
+                if (alarm.Severity == AlarmSeverity.Alarm && !alarm.Acknowledged) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// После штатного останова и после квитирования аварии установка возвращается
+        /// в состояние «Готова», если все разрешающие условия выполнены.
+        /// Без этого повторный пуск был бы невозможен.
+        /// </summary>
+        private void UpdateReadiness()
+        {
+            if (State != MachineState.Stopped) return;
+            if (_startBlocked || HasUnacknowledgedAlarm()) return;
+
+            State = MachineState.Ready;
+            CurrentStepName = "Ожидание пуска";
+            Log(ConsoleLineKind.Info, "Разрешающие условия выполнены: установка готова к пуску");
+        }
+
+        /// <summary>
+        /// Имитация невыполненного разрешающего условия: показывает перечень того,
+        /// что именно препятствует пуску. Только для просмотра фасада.
+        /// </summary>
+        public void ToggleStartBlock()
+        {
+            _startBlocked = !_startBlocked;
+
+            if (_startBlocked)
+            {
+                if (State == MachineState.Ready) State = MachineState.Stopped;
+                Log(ConsoleLineKind.Warning, "Имитация: температура продукта вне допуска, пуск заблокирован");
+            }
+            else
+            {
+                Log(ConsoleLineKind.Info, "Имитация: разрешающее условие восстановлено");
+                UpdateReadiness();
+            }
+
+            Raise();
         }
 
         public IReadOnlyList<AlarmRecord> GetActiveAlarms()
@@ -190,6 +246,7 @@ namespace ChemicalSpill.Services.Demo
         public void Start()
         {
             State = MachineState.Running;
+            CurrentStepName = "Дозирование";
             Log(ConsoleLineKind.Command, "Пуск цикла в режиме «" + DisplayNames.Of(Mode) + "»");
             Raise();
         }
@@ -197,7 +254,12 @@ namespace ChemicalSpill.Services.Demo
         public void Stop()
         {
             State = MachineState.Stopped;
+            CurrentStepName = "Цикл остановлен";
             Log(ConsoleLineKind.Command, "Штатный останов: операции над флаконами в роторе завершаются");
+
+            // Инертная атмосфера и давление сохраняются, поэтому после завершения
+            // останова установка снова готова к пуску.
+            UpdateReadiness();
             Raise();
         }
 
@@ -217,8 +279,13 @@ namespace ChemicalSpill.Services.Demo
         public void ResetAlarm(string operatorName)
         {
             State = MachineState.Stopped;
+            CurrentStepName = "Цикл остановлен";
             foreach (var alarm in _alarms) alarm.Acknowledged = true;
             Log(ConsoleLineKind.Command, "Авария квитирована оператором: " + operatorName);
+
+            // Автоматическое возобновление прерванного цикла не допускается:
+            // установка переводится в «Стоп» и далее, при выполненных условиях, в «Готова».
+            UpdateReadiness();
             Raise();
         }
 
@@ -273,6 +340,10 @@ namespace ChemicalSpill.Services.Demo
                 Jitter("productTemp", 0.02, 19, 25);
                 Jitter("throughput", 0.05, 6.2, 8.4);
                 Jitter("power", 8, 900, 1800);
+            }
+            else
+            {
+                UpdateReadiness();
             }
 
             Raise();

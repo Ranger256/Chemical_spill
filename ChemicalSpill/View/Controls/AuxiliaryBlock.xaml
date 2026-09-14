@@ -10,8 +10,7 @@
     <!-- Вспомогательный блок: входной шлюз, индексация ротора, выходной шлюз.
          В основной цикл не входит, но влияет на его ход; отображается теми же
          цветами состояний (п. 2.4). -->
-    <Border MinWidth="150"
-            Margin="0,0,8,0"
+    <Border Margin="0,0,8,0"
             Background="{Binding State, Converter={StaticResource StageBrush}, ConverterParameter=fill}"
             BorderBrush="{Binding State, Converter={StaticResource StageBrush}, ConverterParameter=stroke}"
             BorderThickness="1"
@@ -20,19 +19,19 @@
         <StackPanel Margin="8,5">
             <TextBlock Text="{Binding Title}"
                        Style="{StaticResource BaseText}"
-                       FontSize="11"
+                       FontSize="13"
                        FontWeight="SemiBold"
                        TextWrapping="Wrap" />
 
             <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
                 <TextBlock Text="{Binding StateGlyph}"
-                           FontSize="11"
+                           FontSize="13"
                            Margin="0,0,5,0"
                            VerticalAlignment="Center"
                            Foreground="{Binding State, Converter={StaticResource StageBrush}, ConverterParameter=text}" />
                 <TextBlock Text="{Binding StateText}"
                            Style="{StaticResource BaseText}"
-                           FontSize="11"
+                           FontSize="13"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"
                            Foreground="{Binding State, Converter={StaticResource StageBrush}, ConverterParameter=text}" />

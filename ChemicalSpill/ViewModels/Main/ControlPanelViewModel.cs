@@ -16,6 +16,9 @@ namespace ChemicalSpill.ViewModels.Main
         private readonly IMachineService _machine;
         private readonly IDialogService _dialogs;
 
+        private MachineState _lastState = (MachineState)(-1);
+        private int _lastBlockingCount = -1;
+
         public ControlPanelViewModel(IMachineService machine, IDialogService dialogs)
         {
             _machine = machine;
@@ -154,6 +157,15 @@ namespace ChemicalSpill.ViewModels.Main
             OnPropertyChanged("BlockingCount");
             OnPropertyChanged("HasBlockingConditions");
             OnPropertyChanged("BlockingText");
+
+            // Доступность кнопок пересматривается сразу, а не по следующему
+            // действию пользователя: иначе после останова «Пуск» остаётся серым.
+            if (_lastState != _machine.State || _lastBlockingCount != BlockingCount)
+            {
+                _lastState = _machine.State;
+                _lastBlockingCount = BlockingCount;
+                RelayCommand.RaiseCanExecuteChanged();
+            }
         }
 
         private void UpdateConditions(IReadOnlyList<StartCondition> conditions)

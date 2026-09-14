@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ChemicalSpill.Models;
@@ -15,6 +16,7 @@ namespace ChemicalSpill.ViewModels.Sections
     {
         private readonly IMachineService _machine;
         private readonly ITrendService _trends;
+        private readonly IDialogService _dialogs;
 
         private string _selectedGroup;
         private TrendWindow _window = TrendWindow.LastTenMinutes;
@@ -24,6 +26,7 @@ namespace ChemicalSpill.ViewModels.Sections
         {
             _machine = machine;
             _trends = trends;
+            _dialogs = dialogs;
 
             Groups = new ObservableCollection<string>();
             Parameters = new ObservableCollection<ParameterItemViewModel>();
@@ -59,10 +62,7 @@ namespace ChemicalSpill.ViewModels.Sections
             foreach (var group in groups) Groups.Add(group);
             _selectedGroup = AllGroups;
 
-            ExportCommand = new RelayCommand(delegate
-            {
-                if (dialogs != null) dialogs.SaveFile("Выгрузка данных графиков", "CSV (*.csv)|*.csv", "trends.csv");
-            });
+            ExportCommand = new RelayCommand(Export);
 
             TogglePauseCommand = new RelayCommand(delegate { IsPaused = !IsPaused; });
 
@@ -143,6 +143,50 @@ namespace ChemicalSpill.ViewModels.Sections
             }
         }
 
+        /// <summary>
+        /// Выгрузка данных выбранных кривых в файл. Данные графиков входят
+        /// в отчёт о партии (п. 2.1 перечня параметров).
+        /// </summary>
+        private void Export()
+        {
+            if (_dialogs == null) return;
+
+            var keys = SelectedKeys();
+            if (keys.Count == 0)
+            {
+                _dialogs.ShowMessage("Выгрузка данных",
+                    "Не выбрано ни одной кривой. Отметьте параметры в списке слева.");
+                return;
+            }
+
+            var name = "Графики_" + DisplayNames.Of(_window).Replace(" ", "_") + "_" +
+                       DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".csv";
+
+            var path = _dialogs.SaveFile("Выгрузка данных графиков", "CSV (*.csv)|*.csv|Все файлы (*.*)|*.*", name);
+            if (path == null) return;
+
+            try
+            {
+                _trends.Export(keys, _window, path);
+                _dialogs.ShowMessage("Выгрузка выполнена",
+                    "Данные графиков сохранены в файл:\n" + path);
+            }
+            catch (Exception error)
+            {
+                _dialogs.ShowMessage("Выгрузка не выполнена", error.Message);
+            }
+        }
+
+        private List<string> SelectedKeys()
+        {
+            var keys = new List<string>();
+            foreach (var item in Series)
+            {
+                if (item.IsSelected) keys.Add(item.Key);
+            }
+            return keys;
+        }
+
         /// <summary>Перезагружает кривые только при изменении набора выбранных параметров.</summary>
         private void OnSeriesPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -151,12 +195,7 @@ namespace ChemicalSpill.ViewModels.Sections
 
         private void ReloadSeries()
         {
-            var keys = new List<string>();
-            foreach (var item in Series)
-            {
-                if (item.IsSelected) keys.Add(item.Key);
-            }
-
+            var keys = SelectedKeys();
             var loaded = _trends.GetSeries(keys, _window);
 
             if (PlottedSeries == null)

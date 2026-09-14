@@ -8,7 +8,7 @@
         d:DataContext="{d:DesignInstance Type=vm:ShellViewModel}"
         Title="{Binding WindowTitle}"
         Width="1600" Height="900"
-        MinWidth="1280" MinHeight="760"
+        MinWidth="1360" MinHeight="860"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         Background="{StaticResource AppBackgroundBrush}"
@@ -16,7 +16,7 @@
         UseLayoutRounding="True">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="30"
+        <WindowChrome CaptionHeight="34"
                       ResizeBorderThickness="6"
                       CornerRadius="0"
                       GlassFrameThickness="0"
@@ -42,9 +42,9 @@
     <Border x:Name="RootBorder" BorderBrush="{StaticResource BorderBrushStrong}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="30" />
+                <RowDefinition Height="34" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="26" />
+                <RowDefinition Height="30" />
             </Grid.RowDefinitions>
 
             <!-- ============================================================
@@ -62,7 +62,7 @@
                     <TextBlock Grid.Column="0"
                                Text="ДОЗ-01"
                                FontWeight="Bold"
-                               FontSize="12"
+                               FontSize="14"
                                Margin="12,0,10,0"
                                VerticalAlignment="Center"
                                Foreground="#7FB6DC" />
@@ -103,6 +103,9 @@
                             <MenuItem Header="Имитация аварии (демонстрация)"
                                       Command="{Binding SimulateAlarmCommand}"
                                       Visibility="{Binding IsDemoMode, Converter={StaticResource BoolToVis}}" />
+                            <MenuItem Header="Имитация блокировки пуска (демонстрация)"
+                                      Command="{Binding SimulateStartBlockCommand}"
+                                      Visibility="{Binding IsDemoMode, Converter={StaticResource BoolToVis}}" />
                         </MenuItem>
 
                         <MenuItem Header="Справка" Style="{StaticResource ChromeMenuItem}">
@@ -112,7 +115,7 @@
 
                     <TextBlock Grid.Column="2"
                                Text="{Binding WindowTitle}"
-                               FontSize="11"
+                               FontSize="13"
                                Margin="16,0"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -143,14 +146,14 @@
                     <DockPanel>
                         <Border DockPanel.Dock="Bottom" Padding="14,10" Background="#1F2833">
                             <StackPanel>
-                                <TextBlock Text="Оператор" FontSize="10" Foreground="#7E8A99" />
+                                <TextBlock Text="Оператор" FontSize="12" Foreground="#7E8A99" />
                                 <TextBlock Text="{Binding OperatorText}"
-                                           FontSize="12"
+                                           FontSize="14"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource TextInverseBrush}"
                                            Margin="0,2,0,0" />
                                 <TextBlock Text="Демонстрационные данные"
-                                           FontSize="10"
+                                           FontSize="12"
                                            Margin="0,8,0,0"
                                            Foreground="#C58200"
                                            Visibility="{Binding IsDemoMode, Converter={StaticResource BoolToVis}}" />
@@ -165,12 +168,12 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="{Binding Glyph}"
-                                                   FontSize="13"
+                                                   FontSize="15"
                                                    Width="22"
                                                    Foreground="#9BB4C9"
                                                    VerticalAlignment="Center" />
                                         <TextBlock Text="{Binding Title}"
-                                                   FontSize="12"
+                                                   FontSize="14"
                                                    Foreground="{StaticResource TextInverseBrush}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
@@ -201,36 +204,36 @@
                                  Margin="0,0,6,0"
                                  Fill="{Binding State, Converter={StaticResource MachineStateBrush}}" />
                         <TextBlock Text="{Binding StateText}"
-                                   FontSize="11"
+                                   FontSize="13"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource TextInverseBrush}"
                                    VerticalAlignment="Center" />
                         <Border Width="1" Background="#3A4553" Margin="10,4" />
-                        <TextBlock Text="{Binding ModeText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ModeText}" FontSize="13" Foreground="#B4BECB" VerticalAlignment="Center" />
                         <Border Width="1" Background="#3A4553" Margin="10,4" />
-                        <TextBlock Text="{Binding StepText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding StepText}" FontSize="13" Foreground="#B4BECB" VerticalAlignment="Center" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
                                 HorizontalAlignment="Center">
-                        <TextBlock Text="{Binding RecipeText}" FontSize="11" Foreground="#DCE3EB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding RecipeText}" FontSize="13" Foreground="#DCE3EB" VerticalAlignment="Center" />
                         <Border Width="1" Background="#3A4553" Margin="10,4" />
-                        <TextBlock Text="{Binding BatchText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding BatchText}" FontSize="13" Foreground="#B4BECB" VerticalAlignment="Center" />
                         <Border Width="1" Background="#3A4553" Margin="10,4" />
-                        <TextBlock Text="{Binding ElapsedText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ElapsedText}" FontSize="13" Foreground="#B4BECB" VerticalAlignment="Center" />
                         <Border Width="1" Background="#3A4553" Margin="10,4" />
-                        <TextBlock Text="{Binding RemainingText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding RemainingText}" FontSize="13" Foreground="#B4BECB" VerticalAlignment="Center" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                        <TextBlock Text="{Binding MemoryText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding MemoryText}" FontSize="13" Foreground="#B4BECB" VerticalAlignment="Center" />
                         <Border Width="1" Background="#3A4553" Margin="10,4" />
                         <Ellipse Width="9" Height="9"
                                  Margin="0,0,6,0"
                                  Fill="{Binding IsLinkOk, Converter={StaticResource BoolBrush}, ConverterParameter=warning}" />
-                        <TextBlock Text="{Binding LinkText}" FontSize="11" Foreground="#DCE3EB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding LinkText}" FontSize="13" Foreground="#DCE3EB" VerticalAlignment="Center" />
                         <Border Width="1" Background="#3A4553" Margin="10,4" />
-                        <TextBlock Text="{Binding ClockText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ClockText}" FontSize="13" Foreground="#B4BECB" VerticalAlignment="Center" />
                     </StackPanel>
                 </Grid>
             </Border>

@@ -1,4 +1,4 @@
-<UserControl x:Class="ChemicalSpill.View.Controls.StageBlock"
+﻿<UserControl x:Class="ChemicalSpill.View.Controls.StageBlock"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -25,9 +25,10 @@
                    Foreground="{StaticResource TextMutedBrush}"
                    Visibility="{Binding ShowInboundArrow, Converter={StaticResource BoolToVis}}" />
 
+        <!-- Минимальная ширина не задаётся: блок ужимается под ячейку,
+             а общее масштабирование выполняет Viewbox мнемосхемы. -->
         <Border Grid.Column="1"
-                MinWidth="120"
-                MinHeight="140"
+                MinHeight="150"
                 VerticalAlignment="Stretch"
                 Background="{Binding State, Converter={StaticResource StageBrush}, ConverterParameter=fill}"
                 BorderBrush="{Binding State, Converter={StaticResource StageBrush}, ConverterParameter=stroke}"
@@ -41,12 +42,12 @@
                     <TextBlock Text="{Binding Title}"
                                Style="{StaticResource BaseText}"
                                FontWeight="SemiBold"
-                               FontSize="13"
+                               FontSize="15"
                                TextWrapping="Wrap" />
 
                     <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                         <TextBlock Text="{Binding StateGlyph}"
-                                   FontSize="14"
+                                   FontSize="16"
                                    Margin="0,0,6,0"
                                    VerticalAlignment="Center"
                                    Foreground="{Binding State, Converter={StaticResource StageBrush}, ConverterParameter=text}" />

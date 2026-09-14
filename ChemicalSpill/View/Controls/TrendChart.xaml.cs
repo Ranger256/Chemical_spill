@@ -15,7 +15,7 @@ namespace ChemicalSpill.View.Controls
     /// </summary>
     public partial class TrendChart : UserControl
     {
-        private const double LeftAxis = 48;
+        private const double LeftAxis = 58;
         private const double BottomAxis = 18;
         private const double TopPadding = 10;
         private const double RightPadding = 10;
@@ -148,7 +148,7 @@ namespace ChemicalSpill.View.Controls
                 var label = new TextBlock
                 {
                     Text = value.ToString("0.##"),
-                    FontSize = 10,
+                    FontSize = 12,
                     FontFamily = new FontFamily("Segoe UI"),
                     Foreground = labelBrush,
                     TextAlignment = TextAlignment.Right,
@@ -209,7 +209,7 @@ namespace ChemicalSpill.View.Controls
             var label = new TextBlock
             {
                 Text = caption + " " + value.ToString("0.##"),
-                FontSize = 9,
+                FontSize = 11,
                 FontFamily = new FontFamily("Segoe UI"),
                 Foreground = brush
             };
@@ -265,7 +265,7 @@ namespace ChemicalSpill.View.Controls
             var label = new TextBlock
             {
                 Text = time.ToString("HH:mm:ss"),
-                FontSize = 10,
+                FontSize = 12,
                 FontFamily = new FontFamily("Segoe UI"),
                 Foreground = brush,
                 Width = 48,

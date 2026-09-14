@@ -303,6 +303,33 @@ namespace ChemicalSpill.View.Converters
         }
     }
 
+    /// <summary>
+    /// Возвращает ширину не меньше заданной в параметре. Нужен мнемосхеме:
+    /// пока места хватает, блоки занимают всю ширину, а на узком окне
+    /// раскладка строится по базовой ширине и целиком ужимается Viewbox'ом,
+    /// сохраняя пропорции, вместо переноса текста в узкие высокие блоки.
+    /// </summary>
+    public class AtLeastConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double actual = value is double ? (double)value : 0;
+
+            double minimum;
+            if (!double.TryParse(parameter as string, NumberStyles.Float, CultureInfo.InvariantCulture, out minimum))
+            {
+                minimum = 0;
+            }
+
+            return actual < minimum ? minimum : actual;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
     /// <summary>Кадр видеонаблюдения из сжатого изображения.</summary>
     public class FrameToImageConverter : IValueConverter
     {

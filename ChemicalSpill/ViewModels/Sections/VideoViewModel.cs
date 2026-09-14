@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 using ChemicalSpill.Services;
 
 namespace ChemicalSpill.ViewModels.Sections
@@ -11,10 +12,12 @@ namespace ChemicalSpill.ViewModels.Sections
     public class VideoViewModel : ViewModelBase
     {
         private readonly IVideoService _video;
+        private readonly IDialogService _dialogs;
 
-        public VideoViewModel(IVideoService video)
+        public VideoViewModel(IVideoService video, IDialogService dialogs)
         {
             _video = video;
+            _dialogs = dialogs;
 
             ToggleLightCommand = new RelayCommand(ToggleLight);
             SnapshotCommand = new RelayCommand(Snapshot);
@@ -80,7 +83,29 @@ namespace ChemicalSpill.ViewModels.Sections
 
         private void Snapshot()
         {
-            _video.TakeSnapshot(null);
+            if (_dialogs == null) return;
+
+            if (_video.GetCurrentFrame() == null)
+            {
+                _dialogs.ShowMessage("Снимок",
+                    "Кадр недоступен: трансляция с установки не ведётся. " +
+                    "Снимок будет доступен после подключения камеры рабочей камеры.");
+                return;
+            }
+
+            var name = "Снимок_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".jpg";
+            var path = _dialogs.SaveFile("Сохранение снимка", "Изображение (*.jpg)|*.jpg|Все файлы (*.*)|*.*", name);
+            if (path == null) return;
+
+            try
+            {
+                _video.TakeSnapshot(path);
+                _dialogs.ShowMessage("Снимок сохранён", path);
+            }
+            catch (Exception error)
+            {
+                _dialogs.ShowMessage("Снимок не сохранён", error.Message);
+            }
         }
 
         private void ToggleStream()

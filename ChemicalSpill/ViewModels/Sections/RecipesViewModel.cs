@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using ChemicalSpill.Models;
 using ChemicalSpill.Services;
@@ -269,23 +270,49 @@ namespace ChemicalSpill.ViewModels.Sections
 
         private void Export()
         {
-            if (_dialogs == null) return;
+            if (_dialogs == null || _selected == null) return;
 
-            var path = _dialogs.SaveFile("Выгрузка рецепта в файл", "Рецепт (*.json)|*.json",
-                _selected.Name + "_v" + _selected.Version + ".json");
+            var name = _selected.Name + "_в" + _selected.Version + ".recipe.txt";
+            var path = _dialogs.SaveFile("Выгрузка рецепта в файл",
+                "Рецепт (*.recipe.txt)|*.recipe.txt|Все файлы (*.*)|*.*", name);
 
-            if (path != null) _recipes.ExportToFile(_selected.Id, path);
+            if (path == null) return;
+
+            try
+            {
+                _recipes.ExportToFile(_selected.Id, path);
+                _dialogs.ShowMessage("Выгрузка выполнена",
+                    "Рецепт сохранён:\n" + path +
+                    "\n\nФайл содержит контрольную сумму, поэтому изменение рецепта после выгрузки обнаруживается при загрузке.");
+            }
+            catch (Exception error)
+            {
+                _dialogs.ShowMessage("Выгрузка не выполнена", error.Message);
+            }
         }
 
         private void Import()
         {
             if (_dialogs == null) return;
 
-            var path = _dialogs.OpenFile("Загрузка рецепта из файла", "Рецепт (*.json)|*.json");
+            var path = _dialogs.OpenFile("Загрузка рецепта из файла",
+                "Рецепт (*.recipe.txt)|*.recipe.txt|Все файлы (*.*)|*.*");
             if (path == null) return;
 
-            Document = _recipes.ImportFromFile(path);
-            OnPropertyChanged("HeaderText");
+            try
+            {
+                Document = _recipes.ImportFromFile(path);
+                Checks.Clear();
+                OnPropertyChanged("HeaderText");
+
+                _dialogs.ShowMessage("Загрузка выполнена",
+                    "Рецепт «" + Document.Summary.Name + "» прочитан из файла как черновик. " +
+                    "Сохраните его, чтобы он попал в перечень рецептов.");
+            }
+            catch (Exception error)
+            {
+                _dialogs.ShowMessage("Загрузка не выполнена", error.Message);
+            }
         }
 
         private void ShowChecks(System.Collections.Generic.IReadOnlyList<CheckResult> results)

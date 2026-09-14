@@ -97,11 +97,11 @@
                                             VerticalAlignment="Center"
                                             Visibility="{Binding Camera.HasFrame, Converter={StaticResource BoolToVis}, ConverterParameter=invert}">
                                     <TextBlock Text="▣"
-                                               FontSize="30"
+                                               FontSize="34"
                                                HorizontalAlignment="Center"
                                                Foreground="#46525F" />
                                     <TextBlock Text="{Binding Camera.PlaceholderText}"
-                                               FontSize="11"
+                                               FontSize="13"
                                                Margin="0,6,0,0"
                                                HorizontalAlignment="Center"
                                                Foreground="#78838F" />
@@ -110,7 +110,7 @@
                                 <Border HorizontalAlignment="Left" VerticalAlignment="Top"
                                         Background="#99000000" Padding="6,3" Margin="6">
                                     <TextBlock Text="{Binding Camera.RecordingText}"
-                                               FontSize="10"
+                                               FontSize="12"
                                                Foreground="#D5DBE3" />
                                 </Border>
                             </Grid>
@@ -124,8 +124,10 @@
                  ============================================================ -->
             <Grid Grid.Column="1" Margin="0,0,8,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <!-- Высота делится пропорционально: панель управления не вытесняет
+                         мнемосхему, а список условий получает остаток места. -->
+                    <RowDefinition Height="0.45*" MinHeight="300" />
+                    <RowDefinition Height="0.55*" MinHeight="380" />
                 </Grid.RowDefinitions>
 
                 <!-- Управление пуском и остановом -->
@@ -140,7 +142,11 @@
                         </DockPanel>
                     </HeaderedContentControl.Header>
 
-                    <StackPanel>
+                    <!-- Полоса прокрутки в карточке одна: состояние, кнопки и сводка
+                         рецепта закреплены сверху, прокручивается только перечень
+                         разрешающих условий. -->
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top">
                         <!-- Состояние установки и режим работы -->
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -154,10 +160,10 @@
                                     CornerRadius="3"
                                     Padding="14,6">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Состояние:" Foreground="#E8EEF5" FontSize="11" VerticalAlignment="Center" />
+                                    <TextBlock Text="Состояние:" Foreground="#E8EEF5" FontSize="13" VerticalAlignment="Center" />
                                     <TextBlock Text="{Binding Control.StateText}"
                                                Foreground="White"
-                                               FontSize="16"
+                                               FontSize="18"
                                                FontWeight="Bold"
                                                Margin="8,0,0,0"
                                                VerticalAlignment="Center" />
@@ -238,7 +244,7 @@
                                     Command="{Binding Control.StopCommand}"
                                     ToolTip="Штатный останов: операции над флаконами в роторе завершаются, атмосфера и давление сохраняются. Подтверждения не требует." />
 
-                            <!-- Экранная кнопка не заменяет устройство аварийного останова:
+                            <!-- Экранная кнопка не заменяет устройство аварийной остановки:
                                  она зависит от исправности контроллера, ОС и экрана (п. 4.2). -->
                             <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                                     Margin="0,8,0,0"
@@ -250,22 +256,28 @@
                                 <DockPanel>
                                     <TextBlock DockPanel.Dock="Left"
                                                Text="⚠"
-                                               FontSize="13"
+                                               FontSize="15"
                                                Margin="0,0,8,0"
                                                VerticalAlignment="Center"
                                                Foreground="{StaticResource AlarmDarkBrush}" />
                                     <TextBlock Style="{StaticResource BaseText}"
-                                               FontSize="11"
+                                               FontSize="13"
                                                TextWrapping="Wrap"
                                                VerticalAlignment="Center"
                                                Foreground="{StaticResource AlarmDarkBrush}">
-                                        <Run Text="АВАРИЙНЫЙ ОСТАНОВ" FontWeight="Bold" />
+                                        <Run Text="АВАРИЙНАЯ ОСТАНОВКА" FontWeight="Bold" />
                                         <Run Text="— аппаратная кнопка с механической фиксацией на установке. Экранная кнопка её не заменяет." />
                                     </TextBlock>
                                 </DockPanel>
                             </Border>
                         </Grid>
 
+                        </StackPanel>
+
+                        <!-- Прокручиваемая часть карточки: сводка рецепта и перечень
+                             разрешающих условий. Полоса прокрутки здесь одна. -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel>
                         <Separator />
 
                         <!-- Сводка рецепта, выводимая перед пуском -->
@@ -317,21 +329,12 @@
                                 Opacity="0.12"
                                 Height="1" />
 
-                        <DockPanel Margin="0,8,0,0">
-                            <TextBlock DockPanel.Dock="Top"
-                                       Text="{Binding Control.BlockingText}"
-                                       Style="{StaticResource BaseText}"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,4" />
+                        <TextBlock Text="{Binding Control.BlockingText}"
+                                   Style="{StaticResource BaseText}"
+                                   FontWeight="SemiBold"
+                                   Margin="0,8,0,4" />
 
-                            <ItemsControl ItemsSource="{Binding Control.StartConditions}" MaxHeight="126">
-                                <ItemsControl.Template>
-                                    <ControlTemplate TargetType="ItemsControl">
-                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                            <ItemsPresenter />
-                                        </ScrollViewer>
-                                    </ControlTemplate>
-                                </ItemsControl.Template>
+                        <ItemsControl ItemsSource="{Binding Control.StartConditions}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <DockPanel Margin="0,1">
@@ -340,21 +343,23 @@
                                                        Width="16"
                                                        FontWeight="Bold"
                                                        Foreground="{Binding Fulfilled, Converter={StaticResource BoolBrush}}" />
+                                            <!-- Отступ справа: значение не должно упираться в полосу прокрутки -->
                                             <TextBlock DockPanel.Dock="Right"
                                                        Text="{Binding Detail}"
                                                        Style="{StaticResource MutedText}"
                                                        TextTrimming="CharacterEllipsis"
                                                        MaxWidth="260"
-                                                       Margin="8,0,0,0" />
+                                                       Margin="8,0,10,0" />
                                             <TextBlock Text="{Binding Text}"
                                                        Style="{StaticResource BaseText}"
                                                        TextTrimming="CharacterEllipsis" />
                                         </DockPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DockPanel>
-                    </StackPanel>
+                        </ItemsControl>
+                        </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
                 </HeaderedContentControl>
 
                 <!-- Мнемосхема технологического цикла -->
@@ -369,7 +374,7 @@
                         </DockPanel>
                     </HeaderedContentControl.Header>
 
-                    <DockPanel>
+                    <DockPanel x:Name="MnemonicRoot">
                         <!-- Переключение формы представления -->
                         <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
                             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
@@ -400,37 +405,64 @@
                             <TextBlock Text="{Binding Mnemonic.ModeHint}"
                                        Style="{StaticResource MutedText}"
                                        VerticalAlignment="Center"
+                                       TextWrapping="NoWrap"
                                        TextTrimming="CharacterEllipsis"
                                        Margin="14,0,0,0" />
                         </DockPanel>
 
-                        <!-- Условные обозначения состояний -->
-                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
+                        <!-- Условные обозначения состояний. WrapPanel: при узкой колонке
+                             обозначения переносятся, а не обрезаются. -->
+                        <WrapPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
                             <TextBlock Text="Состояния:" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,8,0" />
 
                             <Border Background="{StaticResource StateRunningFill}" BorderBrush="{StaticResource StateRunningStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
-                                <TextBlock Text="▶ выполняется" FontSize="10" Foreground="{StaticResource StateRunningText}" />
+                                <TextBlock Text="▶ выполняется" FontSize="12" Foreground="{StaticResource StateRunningText}" />
                             </Border>
                             <Border Background="{StaticResource StateCompletedFill}" BorderBrush="{StaticResource StateCompletedStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
-                                <TextBlock Text="✓ завершена" FontSize="10" Foreground="{StaticResource StateCompletedText}" />
+                                <TextBlock Text="✓ завершена" FontSize="12" Foreground="{StaticResource StateCompletedText}" />
                             </Border>
                             <Border Background="{StaticResource StateWaitingFill}" BorderBrush="{StaticResource StateWaitingStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
-                                <TextBlock Text="⏱ ожидание" FontSize="10" Foreground="{StaticResource StateWaitingText}" />
+                                <TextBlock Text="⏱ ожидание" FontSize="12" Foreground="{StaticResource StateWaitingText}" />
                             </Border>
                             <Border Background="{StaticResource StateInactiveFill}" BorderBrush="{StaticResource StateInactiveStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
-                                <TextBlock Text="– неактивна" FontSize="10" Foreground="{StaticResource StateInactiveText}" />
+                                <TextBlock Text="– неактивна" FontSize="12" Foreground="{StaticResource StateInactiveText}" />
                             </Border>
                             <Border Background="{StaticResource StateFaultFill}" BorderBrush="{StaticResource StateFaultStroke}" BorderThickness="1" Padding="6,2">
-                                <TextBlock Text="⚠ отказ" FontSize="10" Foreground="{StaticResource StateFaultText}" />
+                                <TextBlock Text="⚠ отказ" FontSize="12" Foreground="{StaticResource StateFaultText}" />
                             </Border>
-                        </StackPanel>
+                        </WrapPanel>
 
                         <!-- Вспомогательные блоки: не входят в основной цикл, но влияют на его ход -->
                         <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
                             <TextBlock Text="Вспомогательные станции"
                                        Style="{StaticResource MutedText}"
                                        Margin="0,0,0,4" />
-                            <ItemsControl ItemsSource="{Binding Mnemonic.Auxiliary}">
+                            <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center">
+                                <ItemsControl ItemsSource="{Binding Mnemonic.Auxiliary}"
+                                              Width="{Binding ActualWidth, ElementName=MnemonicRoot,
+                                                              Converter={StaticResource AtLeast}, ConverterParameter=480}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Rows="1" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ctrl:AuxiliaryBlock />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Viewbox>
+                        </StackPanel>
+
+                        <!-- Четыре стадии основного цикла. Блоки делят ширину поровну
+                             и соединяются стрелками в направлении движения флакона.
+                             Viewbox ужимает схему, когда высоты не хватает: иначе блоки
+                             заходили бы под панель вспомогательных станций. -->
+                        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center">
+                            <ItemsControl ItemsSource="{Binding Mnemonic.Stages}"
+                                          Width="{Binding ActualWidth, ElementName=MnemonicRoot,
+                                                          Converter={StaticResource AtLeast}, ConverterParameter=700}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Rows="1" />
@@ -438,27 +470,11 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <ctrl:AuxiliaryBlock />
+                                        <ctrl:StageBlock />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </StackPanel>
-
-                        <!-- Четыре стадии основного цикла.
-                             Блоки делят ширину поровну и соединяются стрелками
-                             в направлении движения флакона. -->
-                        <ItemsControl ItemsSource="{Binding Mnemonic.Stages}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Rows="1" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <ctrl:StageBlock />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        </Viewbox>
                     </DockPanel>
                 </HeaderedContentControl>
             </Grid>
@@ -578,11 +594,11 @@
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="{Binding SeverityText}"
                                                                Style="{StaticResource BaseText}"
-                                                               FontSize="10"
+                                                               FontSize="12"
                                                                FontWeight="Bold" />
                                                     <TextBlock Text="{Binding Code}"
                                                                Style="{StaticResource BaseText}"
-                                                               FontSize="10"
+                                                               FontSize="12"
                                                                FontWeight="Bold"
                                                                Margin="6,0,0,0" />
                                                 </StackPanel>
@@ -607,7 +623,7 @@
                             <CheckBox DockPanel.Dock="Right"
                                       Content="Автопрокрутка"
                                       FontWeight="Normal"
-                                      FontSize="11"
+                                      FontSize="13"
                                       IsChecked="{Binding Console.AutoScroll}" />
                             <TextBlock Text="Консоль событий" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
                         </DockPanel>
@@ -629,21 +645,25 @@
                         </DockPanel>
 
                         <Border Background="{StaticResource ConsoleBackgroundBrush}">
-                            <ScrollViewer x:Name="ConsoleScroll" VerticalScrollBarVisibility="Auto" Padding="6,4">
+                            <!-- Длинные строки не переносятся: сообщение читается целиком
+                                 прокруткой по горизонтали, как в терминале. -->
+                            <ScrollViewer x:Name="ConsoleScroll"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          Padding="6,4">
                                 <ItemsControl ItemsSource="{Binding Console.Items}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
                                                 <TextBlock Text="{Binding TimeText}"
                                                            FontFamily="{StaticResource MonoFont}"
-                                                           FontSize="11"
+                                                           FontSize="13"
                                                            Foreground="{StaticResource ConsoleTimeBrush}"
                                                            Margin="0,0,8,0" />
                                                 <TextBlock Text="{Binding Text}"
                                                            FontFamily="{StaticResource MonoFont}"
-                                                           FontSize="11"
-                                                           TextWrapping="Wrap"
-                                                           MaxWidth="520"
+                                                           FontSize="13"
+                                                           TextWrapping="NoWrap"
                                                            Foreground="{Binding Kind, Converter={StaticResource ConsoleBrush}}" />
                                             </StackPanel>
                                         </DataTemplate>
@@ -673,14 +693,14 @@
                 <StackPanel>
                     <Border Background="{StaticResource AlarmBrush}" Padding="18,12">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚠" FontSize="28" Foreground="White" VerticalAlignment="Center" Margin="0,0,14,0" />
+                            <TextBlock Text="⚠" FontSize="30" Foreground="White" VerticalAlignment="Center" Margin="0,0,14,0" />
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="АВАРИЯ — УПРАВЛЕНИЕ ЗАБЛОКИРОВАНО"
                                            FontSize="18"
                                            FontWeight="Bold"
                                            Foreground="White" />
                                 <TextBlock Text="Цикл остановлен. Требуется вмешательство оператора."
-                                           FontSize="12"
+                                           FontSize="14"
                                            Foreground="#FFE0E0"
                                            Margin="0,2,0,0" />
                             </StackPanel>
@@ -704,7 +724,7 @@
                                 <TextBlock Text="Порядок возврата в работу"
                                            Style="{StaticResource BaseText}"
                                            FontWeight="SemiBold" />
-                                <TextBlock Text="1. Разблокировать аппаратную кнопку аварийного останова, если она была нажата."
+                                <TextBlock Text="1. Разблокировать аппаратную кнопку аварийной остановки, если она была нажата."
                                            Style="{StaticResource CaptionText}" Margin="0,4,0,0" />
                                 <TextBlock Text="2. Устранить причину отказа." Style="{StaticResource CaptionText}" />
                                 <TextBlock Text="3. Проверить состав атмосферы рабочей камеры." Style="{StaticResource CaptionText}" />

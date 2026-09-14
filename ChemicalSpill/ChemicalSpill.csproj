@@ -84,6 +84,7 @@
     <Compile Include="Services\ISettingsService.cs" />
     <Compile Include="Services\ITrendService.cs" />
     <Compile Include="Services\IVideoService.cs" />
+    <Compile Include="Services\Demo\DemoExport.cs" />
     <Compile Include="Services\Demo\DemoJournalService.cs" />
     <Compile Include="Services\Demo\DemoMachineService.cs" />
     <Compile Include="Services\Demo\DemoNetworkService.cs" />

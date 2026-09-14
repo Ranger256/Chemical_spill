@@ -36,6 +36,10 @@ namespace ChemicalSpill.Services.Demo
 
         public void TakeSnapshot(string path)
         {
+            var frame = GetCurrentFrame();
+            if (frame == null || string.IsNullOrEmpty(path)) return;
+
+            System.IO.File.WriteAllBytes(path, frame);
         }
 
         public void StartStream()

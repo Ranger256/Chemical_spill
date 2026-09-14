@@ -81,7 +81,7 @@
                                             HorizontalAlignment="Left"
                                             Background="{Binding State, Converter={StaticResource RecipeStateBrush}}">
                                         <TextBlock Text="{Binding StateText}"
-                                                   FontSize="10"
+                                                   FontSize="12"
                                                    FontWeight="SemiBold"
                                                    Foreground="White" />
                                     </Border>

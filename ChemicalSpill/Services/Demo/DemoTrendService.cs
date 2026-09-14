@@ -24,8 +24,55 @@ namespace ChemicalSpill.Services.Demo
             return result;
         }
 
+        /// <summary>
+        /// Выгрузка данных графиков в файл. Данные входят в отчёт о партии (п. 2.1).
+        /// </summary>
         public void Export(IEnumerable<string> parameterKeys, TrendWindow window, string path)
         {
+            var series = GetSeries(parameterKeys, window);
+            var lines = new List<string>();
+
+            // Заголовок: время и по столбцу на каждую кривую с единицей измерения
+            var header = new List<string> { "Время" };
+            foreach (var item in series)
+            {
+                header.Add(string.IsNullOrEmpty(item.Unit) ? item.Caption : item.Caption + ", " + item.Unit);
+            }
+            lines.Add(DemoExport.Row(header.ToArray()));
+
+            int count = 0;
+            foreach (var item in series)
+            {
+                if (item.Points.Count > count) count = item.Points.Count;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                var row = new List<string>();
+                row.Add(series.Count > 0 && i < series[0].Points.Count
+                    ? series[0].Points[i].Time.ToString("dd.MM.yyyy HH:mm:ss")
+                    : string.Empty);
+
+                foreach (var item in series)
+                {
+                    row.Add(i < item.Points.Count ? item.Points[i].Value.ToString("0.###") : string.Empty);
+                }
+
+                lines.Add(DemoExport.Row(row.ToArray()));
+            }
+
+            // Аварийные уставки выводятся отдельной справкой под таблицей
+            lines.Add(string.Empty);
+            lines.Add(DemoExport.Row("Параметр", "Нижняя граница", "Верхняя граница"));
+            foreach (var item in series)
+            {
+                lines.Add(DemoExport.Row(
+                    item.Caption,
+                    item.LowLimit.HasValue ? item.LowLimit.Value.ToString("0.###") : "—",
+                    item.HighLimit.HasValue ? item.HighLimit.Value.ToString("0.###") : "—"));
+            }
+
+            DemoExport.Write(path, lines);
         }
 
         private TrendSeries Build(string key, int minutes)

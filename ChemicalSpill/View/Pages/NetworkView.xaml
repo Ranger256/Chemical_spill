@@ -192,7 +192,7 @@
                                                 Background="{Binding IsDone, Converter={StaticResource BoolBrush}, ConverterParameter=warning}">
                                             <TextBlock Text="{Binding Number}"
                                                        Foreground="White"
-                                                       FontSize="11"
+                                                       FontSize="13"
                                                        FontWeight="Bold"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" />

@@ -53,7 +53,7 @@ namespace ChemicalSpill.ViewModels
             _journal = journal;
             _dialogs = dialogs;
 
-            Video = new VideoViewModel(video);
+            Video = new VideoViewModel(video, dialogs);
             MainScreen = new MainScreenViewModel(machine, network, dialogs, Video);
             Parameters = new ParametersViewModel(machine, trends, dialogs);
             CycleSettings = new CycleSettingsViewModel(settings, machine, dialogs);
@@ -82,6 +82,7 @@ namespace ChemicalSpill.ViewModels
             DisconnectCommand = new RelayCommand(Disconnect, CanDisconnect);
             ToggleMnemonicCommand = new RelayCommand(ToggleMnemonic);
             SimulateAlarmCommand = new RelayCommand(SimulateAlarm, delegate { return IsDemoMode; });
+            SimulateStartBlockCommand = new RelayCommand(SimulateStartBlock, delegate { return IsDemoMode; });
             AboutCommand = new RelayCommand(About);
 
             _machine.Updated += delegate { RefreshStatus(); };
@@ -115,6 +116,7 @@ namespace ChemicalSpill.ViewModels
         public ICommand DisconnectCommand { get; private set; }
         public ICommand ToggleMnemonicCommand { get; private set; }
         public ICommand SimulateAlarmCommand { get; private set; }
+        public ICommand SimulateStartBlockCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
 
         public SectionViewModel CurrentSection
@@ -271,6 +273,16 @@ namespace ChemicalSpill.ViewModels
             if (demo == null) return;
 
             demo.SimulateAlarm();
+            CurrentSection = Sections[0];
+            MainScreen.Refresh();
+        }
+
+        private void SimulateStartBlock()
+        {
+            var demo = _machine as DemoMachineService;
+            if (demo == null) return;
+
+            demo.ToggleStartBlock();
             CurrentSection = Sections[0];
             MainScreen.Refresh();
         }

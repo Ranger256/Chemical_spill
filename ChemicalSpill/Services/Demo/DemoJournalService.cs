@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using ChemicalSpill.Models;
 
 namespace ChemicalSpill.Services.Demo
@@ -8,9 +9,12 @@ namespace ChemicalSpill.Services.Demo
     public class DemoJournalService : IJournalService
     {
         private readonly List<JournalRecord> _records = new List<JournalRecord>();
+        private readonly IMachineService _machine;
 
-        public DemoJournalService()
+        public DemoJournalService(IMachineService machine)
         {
+            _machine = machine;
+
             var t = DateTime.Now.AddMinutes(-20);
 
             Add(t, JournalCategory.Link, "Соединение с ПК установлено", null, "WS-TECH-04 (192.168.10.25)", MachineState.Stopped);
@@ -53,9 +57,31 @@ namespace ChemicalSpill.Services.Demo
             return result;
         }
 
+        /// <summary>
+        /// Отчёт о партии. Состав определён п. 9 перечня параметров: идентификация
+        /// партии и продукта, оснастка, уставки, статистика по флаконам, сводка по
+        /// атмосфере и перечень аварий.
+        /// </summary>
         public BatchReport BuildReport(string batchNumber)
         {
-            return new BatchReport();
+            var report = new BatchReport
+            {
+                Batch = _machine.Batch,
+                Recipe = _machine.LoadedRecipe,
+                Rotor = _machine.Rotor
+            };
+
+            foreach (var parameter in _machine.GetParameters("Атмосфера рабочей камеры"))
+            {
+                report.AtmosphereSummary.Add(parameter);
+            }
+
+            foreach (var alarm in _machine.GetActiveAlarms())
+            {
+                report.Alarms.Add(alarm);
+            }
+
+            return report;
         }
 
         public IReadOnlyList<string> GetBatchNumbers()
@@ -65,6 +91,108 @@ namespace ChemicalSpill.Services.Demo
 
         public void Export(IEnumerable<JournalRecord> records, string path)
         {
+            var lines = new List<string>
+            {
+                DemoExport.Row("Время", "Категория", "Событие", "Прежнее значение",
+                    "Новое значение", "Оператор", "Состояние установки", "Партия")
+            };
+
+            foreach (var record in records)
+            {
+                lines.Add(DemoExport.Row(
+                    record.Time.ToString("dd.MM.yyyy HH:mm:ss"),
+                    DisplayNames.Of(record.Category),
+                    record.Event,
+                    record.OldValue,
+                    record.NewValue,
+                    record.OperatorName,
+                    DisplayNames.Of(record.MachineState),
+                    record.BatchNumber));
+            }
+
+            DemoExport.Write(path, lines);
+        }
+
+        public void ExportReport(BatchReport report, string path)
+        {
+            var text = new StringBuilder();
+
+            text.AppendLine("ОТЧЁТ О ПАРТИИ");
+            text.AppendLine("Сформирован: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss"));
+            text.AppendLine();
+
+            text.AppendLine("1. Идентификация партии и продукта");
+            if (report.Batch != null)
+            {
+                text.AppendLine("   Номер партии:        " + report.Batch.Number);
+                text.AppendLine("   Продукт:             " + report.Batch.Product);
+                text.AppendLine("   Оператор:            " + report.Batch.OperatorName);
+                text.AppendLine("   Начало:              " + report.Batch.StartedAt.ToString("dd.MM.yyyy HH:mm:ss"));
+                text.AppendLine("   Наработка:           " + report.Batch.Elapsed.ToString(@"hh\:mm\:ss"));
+            }
+            text.AppendLine();
+
+            text.AppendLine("2. Оснастка и типоразмер тары");
+            if (report.Rotor != null)
+            {
+                text.AppendLine("   Тип ротора:          " + report.Rotor.RotorType);
+                text.AppendLine("   Число гнёзд:         " + report.Rotor.NestCount);
+                text.AppendLine("   Типоразмер флакона:  " + report.Rotor.VialSizeMl.ToString("0") + " мл");
+            }
+            text.AppendLine();
+
+            text.AppendLine("3. Рецепт");
+            if (report.Recipe != null)
+            {
+                text.AppendLine("   Наименование:        " + report.Recipe.Name);
+                text.AppendLine("   Версия:              " + report.Recipe.Version);
+                text.AppendLine("   Состояние:           " + DisplayNames.Of(report.Recipe.State));
+                text.AppendLine("   Контрольная сумма:   " + report.Recipe.Checksum);
+                text.AppendLine("   Доза:                " + report.Recipe.DoseMl.ToString("0.00") + " мл");
+            }
+            text.AppendLine();
+
+            text.AppendLine("4. Статистика по флаконам");
+            if (report.Batch != null)
+            {
+                text.AppendLine("   Задание на партию:   " + report.Batch.Target + " шт");
+                text.AppendLine("   Годных:              " + report.Batch.Good + " шт");
+                text.AppendLine("   Забраковано:         " + report.Batch.RejectTotal + " шт");
+
+                foreach (var pair in report.Batch.Rejects)
+                {
+                    text.AppendLine("      " + DisplayNames.Of(pair.Key).PadRight(20) + pair.Value + " шт");
+                }
+
+                text.AppendLine("   Производительность:  " + report.Batch.Throughput.ToString("0.0") + " шт/мин");
+            }
+            text.AppendLine();
+
+            text.AppendLine("5. Сводка по параметрам атмосферы");
+            foreach (var parameter in report.AtmosphereSummary)
+            {
+                var unit = string.IsNullOrEmpty(parameter.Unit) ? string.Empty : " " + parameter.Unit;
+                text.AppendLine("   " + parameter.Caption + ": " + parameter.ValueText + unit +
+                                (string.IsNullOrEmpty(parameter.LimitText) ? string.Empty : " (" + parameter.LimitText + ")"));
+            }
+            text.AppendLine();
+
+            text.AppendLine("6. Перечень возникших аварий и предупреждений");
+            if (report.Alarms.Count == 0)
+            {
+                text.AppendLine("   Отклонений не зарегистрировано.");
+            }
+            else
+            {
+                foreach (var alarm in report.Alarms)
+                {
+                    text.AppendLine("   " + alarm.Time.ToString("dd.MM.yyyy HH:mm:ss") + "  " +
+                                    DisplayNames.Of(alarm.Severity) + " " + alarm.Code + ": " + alarm.Text +
+                                    " (" + alarm.Source + ")");
+                }
+            }
+
+            DemoExport.WriteText(path, text.ToString());
         }
 
         private void Add(DateTime time, JournalCategory category, string name, string oldValue, string newValue, MachineState state)

@@ -19,8 +19,11 @@ namespace ChemicalSpill.Services
         /// <summary>Перечень партий, доступных для отчёта.</summary>
         IReadOnlyList<string> GetBatchNumbers();
 
-        /// <summary>Выгрузка журнала или отчёта в файл.</summary>
+        /// <summary>Выгрузка выбранных записей журнала в файл.</summary>
         void Export(IEnumerable<JournalRecord> records, string path);
+
+        /// <summary>Выгрузка отчёта о партии в файл.</summary>
+        void ExportReport(BatchReport report, string path);
 
         /// <summary>
         /// Заполнение памяти журнала установки, %. При 80 % выводится предупреждение

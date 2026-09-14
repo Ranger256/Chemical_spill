@@ -166,21 +166,57 @@ namespace ChemicalSpill.ViewModels.Sections
         {
             if (_dialogs == null) return;
 
-            var path = _dialogs.SaveFile("Выгрузка журнала", "CSV (*.csv)|*.csv", "journal.csv");
+            var records = _journal.Query(_from, _to, null, _search);
+            if (records.Count == 0)
+            {
+                _dialogs.ShowMessage("Выгрузка журнала",
+                    "За выбранный период записей нет. Измените период или условия отбора.");
+                return;
+            }
+
+            var name = "Журнал_" + _from.ToString("yyyy-MM-dd") + "_" + _to.ToString("yyyy-MM-dd") + ".csv";
+            var path = _dialogs.SaveFile("Выгрузка журнала", "CSV (*.csv)|*.csv|Все файлы (*.*)|*.*", name);
             if (path == null) return;
 
-            var records = _journal.Query(_from, _to, null, _search);
-            _journal.Export(records, path);
+            try
+            {
+                _journal.Export(records, path);
+                _dialogs.ShowMessage("Выгрузка выполнена",
+                    "Записей выгружено: " + records.Count + "\n\nФайл сохранён:\n" + path);
+            }
+            catch (Exception error)
+            {
+                _dialogs.ShowMessage("Выгрузка не выполнена", error.Message);
+            }
         }
 
         private void BuildReport()
         {
-            if (_dialogs == null || _selectedBatch == null) return;
+            if (_dialogs == null) return;
 
-            _journal.BuildReport(_selectedBatch);
-            _dialogs.ShowMessage("Отчёт о партии",
-                "Отчёт по партии " + _selectedBatch + " сформирован. " +
-                "Отчёт ссылается на рецепт, его версию и контрольную сумму.");
+            if (_selectedBatch == null)
+            {
+                _dialogs.ShowMessage("Отчёт о партии", "Не выбрана партия.");
+                return;
+            }
+
+            var name = "Отчёт_" + _selectedBatch + ".txt";
+            var path = _dialogs.SaveFile("Отчёт о партии", "Текстовый файл (*.txt)|*.txt|Все файлы (*.*)|*.*", name);
+            if (path == null) return;
+
+            try
+            {
+                var report = _journal.BuildReport(_selectedBatch);
+                _journal.ExportReport(report, path);
+
+                _dialogs.ShowMessage("Отчёт сформирован",
+                    "Отчёт по партии " + _selectedBatch + " сохранён:\n" + path +
+                    "\n\nОтчёт ссылается на рецепт, его версию и контрольную сумму.");
+            }
+            catch (Exception error)
+            {
+                _dialogs.ShowMessage("Отчёт не сформирован", error.Message);
+            }
         }
     }
 }

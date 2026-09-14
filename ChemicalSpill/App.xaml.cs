@@ -31,7 +31,7 @@ namespace ChemicalSpill
             IRecipeService recipes = new DemoRecipeService();
             ISettingsService settings = new DemoSettingsService();
             INetworkService network = new DemoNetworkService();
-            IJournalService journal = new DemoJournalService();
+            IJournalService journal = new DemoJournalService(machine);
             ITrendService trends = new DemoTrendService();
             IVideoService video = new DemoVideoService();
 

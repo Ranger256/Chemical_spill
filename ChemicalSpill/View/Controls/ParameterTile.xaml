@@ -13,7 +13,7 @@
             BorderBrush="{StaticResource BorderBrushLight}"
             BorderThickness="1"
             Margin="0,0,6,6"
-            MinHeight="84"
+            MinHeight="104"
             SnapsToDevicePixels="True"
             ToolTipService.ShowDuration="30000"
             ToolTip="{Binding ToolTipText}">
@@ -40,11 +40,11 @@
                 <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                     <TextBlock Text="{Binding ValueText}"
                                Style="{StaticResource BaseText}"
-                               FontSize="20"
+                               FontSize="22"
                                FontWeight="SemiBold" />
                     <TextBlock Text="{Binding Unit}"
                                Style="{StaticResource BaseText}"
-                               FontSize="11"
+                               FontSize="13"
                                Margin="4,0,0,2"
                                VerticalAlignment="Bottom"
                                Foreground="{StaticResource TextSecondaryBrush}"

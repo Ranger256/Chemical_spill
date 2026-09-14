@@ -112,11 +112,14 @@
     <FontFamily x:Key="UiFont">Segoe UI</FontFamily>
     <FontFamily x:Key="MonoFont">Consolas</FontFamily>
 
-    <sys:Double x:Key="FontSizeSmall">11</sys:Double>
-    <sys:Double x:Key="FontSizeBody">12</sys:Double>
-    <sys:Double x:Key="FontSizeMedium">13</sys:Double>
-    <sys:Double x:Key="FontSizeSubhead">15</sys:Double>
-    <sys:Double x:Key="FontSizeHeader">18</sys:Double>
-    <sys:Double x:Key="FontSizeValue">24</sys:Double>
+    <!-- Размеры увеличены относительно обычных настольных: за экраном работает
+         оператор, в том числе с ослабленным зрением, и текст должен читаться
+         с рабочего расстояния. -->
+    <sys:Double x:Key="FontSizeSmall">13</sys:Double>
+    <sys:Double x:Key="FontSizeBody">14</sys:Double>
+    <sys:Double x:Key="FontSizeMedium">15</sys:Double>
+    <sys:Double x:Key="FontSizeSubhead">17</sys:Double>
+    <sys:Double x:Key="FontSizeHeader">21</sys:Double>
+    <sys:Double x:Key="FontSizeValue">27</sys:Double>
 
 </ResourceDictionary>
