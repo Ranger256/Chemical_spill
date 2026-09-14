@@ -1,0 +1,735 @@
+﻿<UserControl x:Class="ChemicalSpill.View.Pages.MainScreenView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ctrl="clr-namespace:ChemicalSpill.View.Controls"
+             xmlns:vmm="clr-namespace:ChemicalSpill.ViewModels.Main"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vmm:MainScreenViewModel}"
+             d:DesignWidth="1560" d:DesignHeight="820">
+
+    <Grid>
+        <!-- ================================================================
+             Раскладка главного экрана:
+             слева вверху — основные параметры, слева внизу — камера,
+             в центре вверху — управление, в центре внизу — мнемосхема,
+             справа вверху — подключение, справа в середине — аварии,
+             справа внизу — консоль.
+             ================================================================ -->
+        <Grid x:Name="WorkArea">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.05*" MinWidth="300" />
+                <ColumnDefinition Width="1.65*" MinWidth="460" />
+                <ColumnDefinition Width="1.1*" MinWidth="320" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ============================================================
+                 ЛЕВАЯ КОЛОНКА
+                 ============================================================ -->
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1.45*" />
+                    <RowDefinition Height="1*" MinHeight="190" />
+                </Grid.RowDefinitions>
+
+                <!-- Основные параметры -->
+                <HeaderedContentControl Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,8">
+                    <HeaderedContentControl.Header>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding Parameters.RotorText}"
+                                       Style="{StaticResource MutedText}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Основные параметры" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                        </DockPanel>
+                    </HeaderedContentControl.Header>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Parameters.Items}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="2" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ctrl:ParameterTile />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </HeaderedContentControl>
+
+                <!-- Видеонаблюдение рабочей камеры -->
+                <HeaderedContentControl Grid.Row="1" Style="{StaticResource Card}">
+                    <HeaderedContentControl.Header>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding Camera.StreamText}"
+                                       Style="{StaticResource MutedText}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Видеонаблюдение рабочей камеры" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                        </DockPanel>
+                    </HeaderedContentControl.Header>
+
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Style="{StaticResource ToolButton}"
+                                    Content="{Binding Camera.LightText}"
+                                    Command="{Binding Camera.ToggleLightCommand}"
+                                    Margin="0,0,6,0" />
+                            <Button Style="{StaticResource ToolButton}"
+                                    Content="Снимок"
+                                    Command="{Binding Camera.SnapshotCommand}"
+                                    Margin="0,0,6,0" />
+                            <Button Style="{StaticResource ToolButton}"
+                                    Content="Трансляция"
+                                    Command="{Binding Camera.ToggleStreamCommand}" />
+                        </StackPanel>
+
+                        <Border Background="{StaticResource VideoBackgroundBrush}">
+                            <Grid>
+                                <Image Source="{Binding Camera.CurrentFrame, Converter={StaticResource FrameToImage}}"
+                                       Stretch="Uniform" />
+
+                                <StackPanel HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Visibility="{Binding Camera.HasFrame, Converter={StaticResource BoolToVis}, ConverterParameter=invert}">
+                                    <TextBlock Text="▣"
+                                               FontSize="30"
+                                               HorizontalAlignment="Center"
+                                               Foreground="#46525F" />
+                                    <TextBlock Text="{Binding Camera.PlaceholderText}"
+                                               FontSize="11"
+                                               Margin="0,6,0,0"
+                                               HorizontalAlignment="Center"
+                                               Foreground="#78838F" />
+                                </StackPanel>
+
+                                <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                                        Background="#99000000" Padding="6,3" Margin="6">
+                                    <TextBlock Text="{Binding Camera.RecordingText}"
+                                               FontSize="10"
+                                               Foreground="#D5DBE3" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DockPanel>
+                </HeaderedContentControl>
+            </Grid>
+
+            <!-- ============================================================
+                 ЦЕНТРАЛЬНАЯ КОЛОНКА
+                 ============================================================ -->
+            <Grid Grid.Column="1" Margin="0,0,8,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Управление пуском и остановом -->
+                <HeaderedContentControl Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,8">
+                    <HeaderedContentControl.Header>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding Control.OperatorText}"
+                                       Style="{StaticResource MutedText}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Управление" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                        </DockPanel>
+                    </HeaderedContentControl.Header>
+
+                    <StackPanel>
+                        <!-- Состояние установки и режим работы -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    Background="{Binding Control.State, Converter={StaticResource MachineStateBrush}}"
+                                    CornerRadius="3"
+                                    Padding="14,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Состояние:" Foreground="#E8EEF5" FontSize="11" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Control.StateText}"
+                                               Foreground="White"
+                                               FontSize="16"
+                                               FontWeight="Bold"
+                                               Margin="8,0,0,0"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Текущий шаг цикла" Style="{StaticResource MutedText}" />
+                                <TextBlock Text="{Binding Control.CurrentStepText}"
+                                           Style="{StaticResource BaseText}"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="Режим работы" Style="{StaticResource MutedText}" />
+                                <ComboBox ItemsSource="{Binding Control.Modes}"
+                                          SelectedItem="{Binding Control.SelectedMode}"
+                                          IsEnabled="{Binding Control.CanChangeMode}"
+                                          MinWidth="130"
+                                          Margin="0,2,0,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource EnumDisplay}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+
+                        <Separator />
+
+                        <!-- Органы управления. Пуск слева, Стоп справа с отступом:
+                             кнопки различаются формой и положением, случайное нажатие затруднено. -->
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Style="{StaticResource StartButton}"
+                                    Content="ПУСК"
+                                    Command="{Binding Control.StartCommand}"
+                                    ToolTip="Запуск цикла в выбранном режиме. Подтверждения не требует; сводка рецепта выведена ниже." />
+
+                            <!-- WrapPanel: при узком окне кнопки переносятся на вторую строку,
+                                 а не наезжают на «СТОП». -->
+                            <WrapPanel Grid.Column="1" VerticalAlignment="Center" Margin="14,0">
+                                <Button Style="{StaticResource PauseButton}"
+                                        Content="ПАУЗА"
+                                        Command="{Binding Control.PauseCommand}"
+                                        Margin="0,2,6,2"
+                                        ToolTip="Приостановка цикла в текущем положении с сохранением состояния." />
+                                <Button Style="{StaticResource BaseButton}"
+                                        Content="ШАГ"
+                                        MinHeight="38"
+                                        MinWidth="72"
+                                        Command="{Binding Control.StepCommand}"
+                                        Margin="0,2,6,2"
+                                        ToolTip="Выполнение одной стадии цикла. Доступно в режиме «Шаг»." />
+                                <Button Style="{StaticResource BaseButton}"
+                                        Content="СБРОС АВАРИИ"
+                                        MinHeight="38"
+                                        Padding="10,6"
+                                        Command="{Binding Control.ResetAlarmCommand}"
+                                        Margin="0,2,0,2"
+                                        ToolTip="Квитирование аварийного сообщения после устранения причины." />
+                            </WrapPanel>
+
+                            <Button Grid.Column="2"
+                                    Style="{StaticResource StopButton}"
+                                    Content="СТОП"
+                                    Command="{Binding Control.StopCommand}"
+                                    ToolTip="Штатный останов: операции над флаконами в роторе завершаются, атмосфера и давление сохраняются. Подтверждения не требует." />
+
+                            <!-- Экранная кнопка не заменяет устройство аварийного останова:
+                                 она зависит от исправности контроллера, ОС и экрана (п. 4.2). -->
+                            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                                    Margin="0,8,0,0"
+                                    Background="{StaticResource AlarmSoftBrush}"
+                                    BorderBrush="{StaticResource AlarmBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="2"
+                                    Padding="10,5">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Left"
+                                               Text="⚠"
+                                               FontSize="13"
+                                               Margin="0,0,8,0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource AlarmDarkBrush}" />
+                                    <TextBlock Style="{StaticResource BaseText}"
+                                               FontSize="11"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource AlarmDarkBrush}">
+                                        <Run Text="АВАРИЙНЫЙ ОСТАНОВ" FontWeight="Bold" />
+                                        <Run Text="— аппаратная кнопка с механической фиксацией на установке. Экранная кнопка её не заменяет." />
+                                    </TextBlock>
+                                </DockPanel>
+                            </Border>
+                        </Grid>
+
+                        <Separator />
+
+                        <!-- Сводка рецепта, выводимая перед пуском -->
+                        <Grid Margin="0,2,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Рецепт" Style="{StaticResource MutedText}" />
+                                <TextBlock Text="{Binding Control.RecipeName}" Style="{StaticResource BaseText}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding Control.RecipeVersionText}" Style="{StaticResource MutedText}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Продукт" Style="{StaticResource MutedText}" />
+                                <TextBlock Text="{Binding Control.ProductText}" Style="{StaticResource BaseText}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding Control.BatchNumberText}" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Типоразмер тары" Style="{StaticResource MutedText}" />
+                                <TextBlock Text="{Binding Control.VialSizeText}" Style="{StaticResource BaseText}" FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="Доза" Style="{StaticResource MutedText}" />
+                                <TextBlock Text="{Binding Control.DoseText}" Style="{StaticResource BaseText}" FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Задание на партию" Style="{StaticResource MutedText}" />
+                                <TextBlock Text="{Binding Control.BatchTargetText}" Style="{StaticResource BaseText}" FontWeight="SemiBold" />
+                                <Button Style="{StaticResource ToolButton}"
+                                        Content="Выбрать рецепт…"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,4,0,0"
+                                        Command="{Binding Control.SelectRecipeCommand}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Разрешающие условия пуска -->
+                        <Border Margin="0,10,0,0"
+                                Background="{Binding Control.HasBlockingConditions, Converter={StaticResource BoolBrush}, ConverterParameter=warning}"
+                                Opacity="0.12"
+                                Height="1" />
+
+                        <DockPanel Margin="0,8,0,0">
+                            <TextBlock DockPanel.Dock="Top"
+                                       Text="{Binding Control.BlockingText}"
+                                       Style="{StaticResource BaseText}"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,4" />
+
+                            <ItemsControl ItemsSource="{Binding Control.StartConditions}" MaxHeight="126">
+                                <ItemsControl.Template>
+                                    <ControlTemplate TargetType="ItemsControl">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <ItemsPresenter />
+                                        </ScrollViewer>
+                                    </ControlTemplate>
+                                </ItemsControl.Template>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,1">
+                                            <TextBlock DockPanel.Dock="Left"
+                                                       Text="{Binding Glyph}"
+                                                       Width="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{Binding Fulfilled, Converter={StaticResource BoolBrush}}" />
+                                            <TextBlock DockPanel.Dock="Right"
+                                                       Text="{Binding Detail}"
+                                                       Style="{StaticResource MutedText}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       MaxWidth="260"
+                                                       Margin="8,0,0,0" />
+                                            <TextBlock Text="{Binding Text}"
+                                                       Style="{StaticResource BaseText}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </DockPanel>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <!-- Мнемосхема технологического цикла -->
+                <HeaderedContentControl Grid.Row="1" Style="{StaticResource Card}">
+                    <HeaderedContentControl.Header>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding Mnemonic.RotorPositionText}"
+                                       Style="{StaticResource MutedText}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Мнемосхема технологического цикла" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                        </DockPanel>
+                    </HeaderedContentControl.Header>
+
+                    <DockPanel>
+                        <!-- Переключение формы представления -->
+                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                                <RadioButton Style="{StaticResource SegmentButton}"
+                                             Content="Вид по станциям"
+                                             GroupName="MnemonicMode"
+                                             IsChecked="{Binding Mnemonic.IsByStation, Mode=OneWay}"
+                                             Command="{Binding Mnemonic.SetByStationCommand}"
+                                             ToolTip="Основной режим: что сейчас делает установка." />
+                                <RadioButton Style="{StaticResource SegmentButton}"
+                                             Content="Вид по флакону"
+                                             GroupName="MnemonicMode"
+                                             IsChecked="{Binding Mnemonic.IsByVial, Mode=OneWay}"
+                                             Command="{Binding Mnemonic.SetByVialCommand}"
+                                             ToolTip="Вспомогательный режим: что происходит с конкретным флаконом." />
+
+                                <TextBlock Text="Гнездо"
+                                           Style="{StaticResource MutedText}"
+                                           VerticalAlignment="Center"
+                                           Margin="12,0,6,0"
+                                           Visibility="{Binding Mnemonic.IsByVial, Converter={StaticResource BoolToVis}}" />
+                                <ComboBox ItemsSource="{Binding Mnemonic.Nests}"
+                                          SelectedItem="{Binding Mnemonic.SelectedNest}"
+                                          MinWidth="64"
+                                          Visibility="{Binding Mnemonic.IsByVial, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding Mnemonic.ModeHint}"
+                                       Style="{StaticResource MutedText}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="14,0,0,0" />
+                        </DockPanel>
+
+                        <!-- Условные обозначения состояний -->
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
+                            <TextBlock Text="Состояния:" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,8,0" />
+
+                            <Border Background="{StaticResource StateRunningFill}" BorderBrush="{StaticResource StateRunningStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
+                                <TextBlock Text="▶ выполняется" FontSize="10" Foreground="{StaticResource StateRunningText}" />
+                            </Border>
+                            <Border Background="{StaticResource StateCompletedFill}" BorderBrush="{StaticResource StateCompletedStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
+                                <TextBlock Text="✓ завершена" FontSize="10" Foreground="{StaticResource StateCompletedText}" />
+                            </Border>
+                            <Border Background="{StaticResource StateWaitingFill}" BorderBrush="{StaticResource StateWaitingStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
+                                <TextBlock Text="⏱ ожидание" FontSize="10" Foreground="{StaticResource StateWaitingText}" />
+                            </Border>
+                            <Border Background="{StaticResource StateInactiveFill}" BorderBrush="{StaticResource StateInactiveStroke}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
+                                <TextBlock Text="– неактивна" FontSize="10" Foreground="{StaticResource StateInactiveText}" />
+                            </Border>
+                            <Border Background="{StaticResource StateFaultFill}" BorderBrush="{StaticResource StateFaultStroke}" BorderThickness="1" Padding="6,2">
+                                <TextBlock Text="⚠ отказ" FontSize="10" Foreground="{StaticResource StateFaultText}" />
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Вспомогательные блоки: не входят в основной цикл, но влияют на его ход -->
+                        <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+                            <TextBlock Text="Вспомогательные станции"
+                                       Style="{StaticResource MutedText}"
+                                       Margin="0,0,0,4" />
+                            <ItemsControl ItemsSource="{Binding Mnemonic.Auxiliary}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Rows="1" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ctrl:AuxiliaryBlock />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <!-- Четыре стадии основного цикла.
+                             Блоки делят ширину поровну и соединяются стрелками
+                             в направлении движения флакона. -->
+                        <ItemsControl ItemsSource="{Binding Mnemonic.Stages}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="1" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ctrl:StageBlock />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DockPanel>
+                </HeaderedContentControl>
+            </Grid>
+
+            <!-- ============================================================
+                 ПРАВАЯ КОЛОНКА
+                 ============================================================ -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="1*" MinHeight="160" />
+                    <RowDefinition Height="1*" MinHeight="160" />
+                </Grid.RowDefinitions>
+
+                <!-- Подключение к установке -->
+                <HeaderedContentControl Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,8">
+                    <HeaderedContentControl.Header>
+                        <DockPanel>
+                            <Ellipse DockPanel.Dock="Right"
+                                     Width="9" Height="9"
+                                     VerticalAlignment="Center"
+                                     Fill="{Binding Connection.IsConnected, Converter={StaticResource BoolBrush}, ConverterParameter=warning}" />
+                            <TextBlock Text="Подключение к установке" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                        </DockPanel>
+                    </HeaderedContentControl.Header>
+
+                    <StackPanel>
+                        <TextBlock Text="{Binding Connection.LinkStateText}"
+                                   Style="{StaticResource SubheadText}"
+                                   Margin="0,0,0,6" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Физическое соединение" Style="{StaticResource MutedText}" Margin="0,1,10,1" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Connection.PhysicalText}" Style="{StaticResource BaseText}" Margin="0,1" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Канал" Style="{StaticResource MutedText}" Margin="0,1,10,1" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Connection.SpeedText}" Style="{StaticResource BaseText}" Margin="0,1" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Адрес установки" Style="{StaticResource MutedText}" Margin="0,1,10,1" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Connection.AddressText}" Style="{StaticResource BaseText}" Margin="0,1" />
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Подключённый клиент" Style="{StaticResource MutedText}" Margin="0,1,10,1" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Connection.ClientText}" Style="{StaticResource BaseText}" TextTrimming="CharacterEllipsis" Margin="0,1" />
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Задержка обмена" Style="{StaticResource MutedText}" Margin="0,1,10,1" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Connection.LatencyText}" Style="{StaticResource BaseText}" Margin="0,1" />
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Ошибки и потери" Style="{StaticResource MutedText}" Margin="0,1,10,1" />
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Connection.ErrorsText}" Style="{StaticResource BaseText}" Margin="0,1" />
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Style="{StaticResource ToolButton}"
+                                    Content="Подключиться…"
+                                    Command="{Binding Connection.ConnectCommand}"
+                                    Margin="0,0,6,0" />
+                            <Button Style="{StaticResource ToolButton}"
+                                    Content="Разорвать"
+                                    Command="{Binding Connection.DisconnectCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <!-- Аварии и предупреждения -->
+                <HeaderedContentControl Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,8">
+                    <HeaderedContentControl.Header>
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding Alarms.CountersText}"
+                                       Style="{StaticResource MutedText}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Аварии и предупреждения" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                        </DockPanel>
+                    </HeaderedContentControl.Header>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Alarms.Items}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,5"
+                                            Padding="8,5">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+                                                <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAlarm}" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource AlarmSoftBrush}" />
+                                                        <Setter Property="BorderBrush" Value="{StaticResource AlarmBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Acknowledged}" Value="True">
+                                                        <Setter Property="Opacity" Value="0.55" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <StackPanel>
+                                            <DockPanel>
+                                                <TextBlock DockPanel.Dock="Right"
+                                                           Text="{Binding TimeText}"
+                                                           Style="{StaticResource MutedText}" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding SeverityText}"
+                                                               Style="{StaticResource BaseText}"
+                                                               FontSize="10"
+                                                               FontWeight="Bold" />
+                                                    <TextBlock Text="{Binding Code}"
+                                                               Style="{StaticResource BaseText}"
+                                                               FontSize="10"
+                                                               FontWeight="Bold"
+                                                               Margin="6,0,0,0" />
+                                                </StackPanel>
+                                            </DockPanel>
+                                            <TextBlock Text="{Binding Text}"
+                                                       Style="{StaticResource BaseText}"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,2,0,0" />
+                                            <TextBlock Text="{Binding Source}" Style="{StaticResource MutedText}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </HeaderedContentControl>
+
+                <!-- Консоль событий -->
+                <HeaderedContentControl Grid.Row="2" Style="{StaticResource Card}">
+                    <HeaderedContentControl.Header>
+                        <DockPanel>
+                            <CheckBox DockPanel.Dock="Right"
+                                      Content="Автопрокрутка"
+                                      FontWeight="Normal"
+                                      FontSize="11"
+                                      IsChecked="{Binding Console.AutoScroll}" />
+                            <TextBlock Text="Консоль событий" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                        </DockPanel>
+                    </HeaderedContentControl.Header>
+
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                            <Button DockPanel.Dock="Right"
+                                    Style="{StaticResource ToolButton}"
+                                    Content="Очистить"
+                                    Margin="6,0,0,0"
+                                    Command="{Binding Console.ClearCommand}" />
+                            <Button DockPanel.Dock="Right"
+                                    Style="{StaticResource ToolButton}"
+                                    Content="Ввод"
+                                    Margin="6,0,0,0"
+                                    Command="{Binding Console.SendCommand}" />
+                            <TextBox Text="{Binding Console.Input, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+
+                        <Border Background="{StaticResource ConsoleBackgroundBrush}">
+                            <ScrollViewer x:Name="ConsoleScroll" VerticalScrollBarVisibility="Auto" Padding="6,4">
+                                <ItemsControl ItemsSource="{Binding Console.Items}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,1">
+                                                <TextBlock Text="{Binding TimeText}"
+                                                           FontFamily="{StaticResource MonoFont}"
+                                                           FontSize="11"
+                                                           Foreground="{StaticResource ConsoleTimeBrush}"
+                                                           Margin="0,0,8,0" />
+                                                <TextBlock Text="{Binding Text}"
+                                                           FontFamily="{StaticResource MonoFont}"
+                                                           FontSize="11"
+                                                           TextWrapping="Wrap"
+                                                           MaxWidth="520"
+                                                           Foreground="{Binding Kind, Converter={StaticResource ConsoleBrush}}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </DockPanel>
+                </HeaderedContentControl>
+            </Grid>
+        </Grid>
+
+        <!-- ================================================================
+             Блокирующая панель аварии. Перекрывает рабочую область:
+             управление недоступно, пока оператор не подтвердит устранение
+             причины и не квитирует аварию.
+             ================================================================ -->
+        <Grid Visibility="{Binding IsLocked, Converter={StaticResource BoolToVis}}">
+            <Rectangle Fill="#B3101820" />
+
+            <Border MaxWidth="720"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Background="White"
+                    BorderBrush="{StaticResource AlarmBrush}"
+                    BorderThickness="3">
+                <StackPanel>
+                    <Border Background="{StaticResource AlarmBrush}" Padding="18,12">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚠" FontSize="28" Foreground="White" VerticalAlignment="Center" Margin="0,0,14,0" />
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="АВАРИЯ — УПРАВЛЕНИЕ ЗАБЛОКИРОВАНО"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="White" />
+                                <TextBlock Text="Цикл остановлен. Требуется вмешательство оператора."
+                                           FontSize="12"
+                                           Foreground="#FFE0E0"
+                                           Margin="0,2,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Margin="18,16">
+                        <TextBlock Text="{Binding Alarms.BlockingAlarmText}"
+                                   Style="{StaticResource SubheadText}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Alarms.BlockingAlarmSource}"
+                                   Style="{StaticResource MutedText}"
+                                   Margin="0,4,0,0" />
+
+                        <Border Background="{StaticResource PanelHeaderBrush}"
+                                BorderBrush="{StaticResource BorderBrushLight}"
+                                BorderThickness="1"
+                                Padding="12,10"
+                                Margin="0,14,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Порядок возврата в работу"
+                                           Style="{StaticResource BaseText}"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="1. Разблокировать аппаратную кнопку аварийного останова, если она была нажата."
+                                           Style="{StaticResource CaptionText}" Margin="0,4,0,0" />
+                                <TextBlock Text="2. Устранить причину отказа." Style="{StaticResource CaptionText}" />
+                                <TextBlock Text="3. Проверить состав атмосферы рабочей камеры." Style="{StaticResource CaptionText}" />
+                                <TextBlock Text="4. Квитировать аварию. Автоматическое возобновление прерванного цикла не допускается."
+                                           Style="{StaticResource CaptionText}" />
+                            </StackPanel>
+                        </Border>
+
+                        <CheckBox Margin="0,14,0,0"
+                                  IsChecked="{Binding Alarms.CauseEliminated}"
+                                  Content="Причина устранена, оборудование осмотрено, состав атмосферы проверен" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0" HorizontalAlignment="Right">
+                            <TextBlock Text="Квитирование не выполняется автоматически."
+                                       Style="{StaticResource MutedText}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,12,0" />
+                            <Button Style="{StaticResource AccentButton}"
+                                    Content="Квитировать и разблокировать экран"
+                                    MinHeight="36"
+                                    Command="{Binding Alarms.AcknowledgeCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

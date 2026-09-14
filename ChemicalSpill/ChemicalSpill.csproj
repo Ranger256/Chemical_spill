@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{910B6B5E-5856-4C58-866E-B6BF38CE1EEC}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>ChemicalSpill</RootNamespace>
+    <AssemblyName>ChemicalSpill</AssemblyName>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
+  <!-- Точка входа приложения -->
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <!-- Модели данных -->
+  <ItemGroup>
+    <Compile Include="Models\DisplayNames.cs" />
+    <Compile Include="Models\Enums.cs" />
+    <Compile Include="Models\JournalDto.cs" />
+    <Compile Include="Models\MachineDto.cs" />
+    <Compile Include="Models\NetworkDto.cs" />
+    <Compile Include="Models\RecipeDto.cs" />
+    <Compile Include="Models\SettingsDto.cs" />
+  </ItemGroup>
+
+  <!-- Контракты сервисов: точка подключения ядра -->
+  <ItemGroup>
+    <Compile Include="Services\IDialogService.cs" />
+    <Compile Include="Services\IJournalService.cs" />
+    <Compile Include="Services\IMachineService.cs" />
+    <Compile Include="Services\INetworkService.cs" />
+    <Compile Include="Services\IRecipeService.cs" />
+    <Compile Include="Services\ISettingsService.cs" />
+    <Compile Include="Services\ITrendService.cs" />
+    <Compile Include="Services\IVideoService.cs" />
+    <Compile Include="Services\Demo\DemoJournalService.cs" />
+    <Compile Include="Services\Demo\DemoMachineService.cs" />
+    <Compile Include="Services\Demo\DemoNetworkService.cs" />
+    <Compile Include="Services\Demo\DemoRecipeService.cs" />
+    <Compile Include="Services\Demo\DemoSettingsService.cs" />
+    <Compile Include="Services\Demo\DemoTrendService.cs" />
+    <Compile Include="Services\Demo\DemoVideoService.cs" />
+  </ItemGroup>
+
+  <!-- Модели представления -->
+  <ItemGroup>
+    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="ViewModels\Dialogs\ConnectViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\RecipeSelectViewModel.cs" />
+    <Compile Include="ViewModels\Items\ListItemViewModels.cs" />
+    <Compile Include="ViewModels\Items\ParameterItemViewModel.cs" />
+    <Compile Include="ViewModels\Items\StageViewModel.cs" />
+    <Compile Include="ViewModels\Items\TrendSeriesViewModel.cs" />
+    <Compile Include="ViewModels\Main\AlarmPanelViewModel.cs" />
+    <Compile Include="ViewModels\Main\ConnectionPanelViewModel.cs" />
+    <Compile Include="ViewModels\Main\ConsolePanelViewModel.cs" />
+    <Compile Include="ViewModels\Main\ControlPanelViewModel.cs" />
+    <Compile Include="ViewModels\Main\KeyParametersViewModel.cs" />
+    <Compile Include="ViewModels\Main\MainScreenViewModel.cs" />
+    <Compile Include="ViewModels\Main\MnemonicViewModel.cs" />
+    <Compile Include="ViewModels\Sections\CycleSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Sections\JournalViewModel.cs" />
+    <Compile Include="ViewModels\Sections\NetworkViewModel.cs" />
+    <Compile Include="ViewModels\Sections\ParametersViewModel.cs" />
+    <Compile Include="ViewModels\Sections\RecipesViewModel.cs" />
+    <Compile Include="ViewModels\Sections\VideoViewModel.cs" />
+  </ItemGroup>
+
+  <!-- Представление: оформление -->
+  <ItemGroup>
+    <Page Include="View\Themes\Palette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Themes\Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Themes\ViewMapping.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Converters\CommonConverters.cs" />
+    <Compile Include="View\Services\DialogService.cs" />
+  </ItemGroup>
+
+  <!-- Представление: оболочка -->
+  <ItemGroup>
+    <Page Include="View\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <!-- Представление: элементы -->
+  <ItemGroup>
+    <Page Include="View\Controls\AuxiliaryBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Controls\AuxiliaryBlock.xaml.cs">
+      <DependentUpon>AuxiliaryBlock.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Controls\ParameterTile.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Controls\ParameterTile.xaml.cs">
+      <DependentUpon>ParameterTile.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Controls\StageBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Controls\StageBlock.xaml.cs">
+      <DependentUpon>StageBlock.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Controls\TrendChart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Controls\TrendChart.xaml.cs">
+      <DependentUpon>TrendChart.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <!-- Представление: экраны разделов -->
+  <ItemGroup>
+    <Page Include="View\Pages\MainScreenView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Pages\MainScreenView.xaml.cs">
+      <DependentUpon>MainScreenView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Pages\ParametersView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Pages\ParametersView.xaml.cs">
+      <DependentUpon>ParametersView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Pages\CycleSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Pages\CycleSettingsView.xaml.cs">
+      <DependentUpon>CycleSettingsView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Pages\RecipesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Pages\RecipesView.xaml.cs">
+      <DependentUpon>RecipesView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Pages\JournalView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Pages\JournalView.xaml.cs">
+      <DependentUpon>JournalView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Pages\NetworkView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Pages\NetworkView.xaml.cs">
+      <DependentUpon>NetworkView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Pages\VideoView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Pages\VideoView.xaml.cs">
+      <DependentUpon>VideoView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <!-- Представление: модальные окна -->
+  <ItemGroup>
+    <Page Include="View\Dialogs\RecipeSelectDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Dialogs\RecipeSelectDialog.xaml.cs">
+      <DependentUpon>RecipeSelectDialog.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\Dialogs\ConnectDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="View\Dialogs\ConnectDialog.xaml.cs">
+      <DependentUpon>ConnectDialog.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="README_UI.md" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

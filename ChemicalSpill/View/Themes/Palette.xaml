@@ -1,0 +1,122 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ================================================================
+         Палитра светлой промышленной темы.
+         Цвета состояний стадии заданы по п. 2.3 функционального интерфейса.
+         Цвет нигде не является единственным носителем информации: рядом
+         всегда выводится текст и графический знак.
+         ================================================================ -->
+
+    <!-- Основа -->
+    <Color x:Key="AppBackgroundColor">#EEF1F5</Color>
+    <Color x:Key="PanelColor">#FFFFFF</Color>
+    <Color x:Key="PanelHeaderColor">#F3F6F9</Color>
+    <Color x:Key="BorderColor">#D5DBE3</Color>
+    <Color x:Key="BorderStrongColor">#B3BCC9</Color>
+
+    <Color x:Key="TextPrimaryColor">#1B2330</Color>
+    <Color x:Key="TextSecondaryColor">#5A6473</Color>
+    <Color x:Key="TextMutedColor">#8B95A5</Color>
+    <Color x:Key="TextInverseColor">#F2F5F9</Color>
+
+    <Color x:Key="AccentColor">#1C6EA4</Color>
+    <Color x:Key="AccentDarkColor">#155C8A</Color>
+    <Color x:Key="AccentSoftColor">#E3EEF6</Color>
+
+    <Color x:Key="ChromeColor">#1E2733</Color>
+    <Color x:Key="ChromeHoverColor">#303C4B</Color>
+    <Color x:Key="SidebarColor">#26303D</Color>
+    <Color x:Key="SidebarHoverColor">#33414F</Color>
+
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="{StaticResource AppBackgroundColor}" />
+    <SolidColorBrush x:Key="PanelBrush" Color="{StaticResource PanelColor}" />
+    <SolidColorBrush x:Key="PanelHeaderBrush" Color="{StaticResource PanelHeaderColor}" />
+    <SolidColorBrush x:Key="BorderBrushLight" Color="{StaticResource BorderColor}" />
+    <SolidColorBrush x:Key="BorderBrushStrong" Color="{StaticResource BorderStrongColor}" />
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}" />
+    <SolidColorBrush x:Key="TextInverseBrush" Color="{StaticResource TextInverseColor}" />
+
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource AccentDarkColor}" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="{StaticResource AccentSoftColor}" />
+
+    <SolidColorBrush x:Key="ChromeBrush" Color="{StaticResource ChromeColor}" />
+    <SolidColorBrush x:Key="ChromeHoverBrush" Color="{StaticResource ChromeHoverColor}" />
+    <SolidColorBrush x:Key="SidebarBrush" Color="{StaticResource SidebarColor}" />
+    <SolidColorBrush x:Key="SidebarHoverBrush" Color="{StaticResource SidebarHoverColor}" />
+
+    <!-- Состояния стадии: заливка, контур, текст -->
+    <SolidColorBrush x:Key="StateRunningFill" Color="#D7EFD9" />
+    <SolidColorBrush x:Key="StateRunningStroke" Color="#2E7D32" />
+    <SolidColorBrush x:Key="StateRunningText" Color="#1B5E20" />
+
+    <SolidColorBrush x:Key="StateCompletedFill" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="StateCompletedStroke" Color="#2E7D32" />
+    <SolidColorBrush x:Key="StateCompletedText" Color="#1B5E20" />
+
+    <SolidColorBrush x:Key="StateWaitingFill" Color="#FCF1D1" />
+    <SolidColorBrush x:Key="StateWaitingStroke" Color="#C08A12" />
+    <SolidColorBrush x:Key="StateWaitingText" Color="#7A5600" />
+
+    <SolidColorBrush x:Key="StateInactiveFill" Color="#ECEFF3" />
+    <SolidColorBrush x:Key="StateInactiveStroke" Color="#B3BCC9" />
+    <SolidColorBrush x:Key="StateInactiveText" Color="#66707E" />
+
+    <SolidColorBrush x:Key="StateFaultFill" Color="#FADCDC" />
+    <SolidColorBrush x:Key="StateFaultStroke" Color="#C62828" />
+    <SolidColorBrush x:Key="StateFaultText" Color="#8E1B1B" />
+
+    <!-- Оценка значений и аварии -->
+    <SolidColorBrush x:Key="OkBrush" Color="#2E7D32" />
+    <SolidColorBrush x:Key="OkSoftBrush" Color="#E4F2E5" />
+    <SolidColorBrush x:Key="WarningBrush" Color="#C58200" />
+    <SolidColorBrush x:Key="WarningSoftBrush" Color="#FCF1D1" />
+    <SolidColorBrush x:Key="AlarmBrush" Color="#C62828" />
+    <SolidColorBrush x:Key="AlarmDarkBrush" Color="#8E1B1B" />
+    <SolidColorBrush x:Key="AlarmSoftBrush" Color="#FADCDC" />
+
+    <!-- Органы управления. Пуск и Стоп различаются не только цветом,
+         но и формой и положением (п. 4.4). -->
+    <SolidColorBrush x:Key="StartBrush" Color="#2E7D32" />
+    <SolidColorBrush x:Key="StartHoverBrush" Color="#27682B" />
+    <SolidColorBrush x:Key="StopBrush" Color="#C62828" />
+    <SolidColorBrush x:Key="StopHoverBrush" Color="#A81F1F" />
+    <SolidColorBrush x:Key="PauseBrush" Color="#D98A00" />
+    <SolidColorBrush x:Key="PauseHoverBrush" Color="#B87500" />
+
+    <!-- Консоль -->
+    <SolidColorBrush x:Key="ConsoleBackgroundBrush" Color="#1B222C" />
+    <SolidColorBrush x:Key="ConsoleTextBrush" Color="#D5DBE3" />
+    <SolidColorBrush x:Key="ConsoleTimeBrush" Color="#78838F" />
+    <SolidColorBrush x:Key="ConsoleCommandBrush" Color="#6FB3E0" />
+    <SolidColorBrush x:Key="ConsoleWarningBrush" Color="#E8B44A" />
+    <SolidColorBrush x:Key="ConsoleErrorBrush" Color="#E86C6C" />
+
+    <!-- Видео -->
+    <SolidColorBrush x:Key="VideoBackgroundBrush" Color="#151A21" />
+
+    <!-- Цвета кривых графиков -->
+    <SolidColorBrush x:Key="Series1Brush" Color="#1C6EA4" />
+    <SolidColorBrush x:Key="Series2Brush" Color="#2E7D32" />
+    <SolidColorBrush x:Key="Series3Brush" Color="#B5651D" />
+    <SolidColorBrush x:Key="Series4Brush" Color="#7A4FA3" />
+    <SolidColorBrush x:Key="Series5Brush" Color="#0F8A8A" />
+    <SolidColorBrush x:Key="Series6Brush" Color="#A03050" />
+
+    <!-- Типографика -->
+    <FontFamily x:Key="UiFont">Segoe UI</FontFamily>
+    <FontFamily x:Key="MonoFont">Consolas</FontFamily>
+
+    <sys:Double x:Key="FontSizeSmall">11</sys:Double>
+    <sys:Double x:Key="FontSizeBody">12</sys:Double>
+    <sys:Double x:Key="FontSizeMedium">13</sys:Double>
+    <sys:Double x:Key="FontSizeSubhead">15</sys:Double>
+    <sys:Double x:Key="FontSizeHeader">18</sys:Double>
+    <sys:Double x:Key="FontSizeValue">24</sys:Double>
+
+</ResourceDictionary>

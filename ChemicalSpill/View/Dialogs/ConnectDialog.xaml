@@ -1,0 +1,164 @@
+﻿<Window x:Class="ChemicalSpill.View.Dialogs.ConnectDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vmd="clr-namespace:ChemicalSpill.ViewModels.Dialogs"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vmd:ConnectViewModel}"
+        Title="Подключение к установке"
+        Width="620" Height="580"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontFamily="{StaticResource UiFont}"
+        Background="{StaticResource AppBackgroundBrush}"
+        UseLayoutRounding="True">
+
+    <DockPanel Margin="14">
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+            <TextBlock Text="Подключение к установке" Style="{StaticResource HeaderText}" />
+            <TextBlock Text="Подключение подтверждается двумя ключами: первый вводится на этом компьютере и подтверждает право доступа, второй — на панели оператора и подтверждает присутствие человека у установки."
+                       Style="{StaticResource MutedText}"
+                       TextWrapping="Wrap"
+                       Margin="0,4,0,0" />
+        </StackPanel>
+
+        <Border DockPanel.Dock="Bottom"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource BorderBrushLight}"
+                BorderThickness="1"
+                Padding="10"
+                Margin="0,12,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button x:Name="ConnectButton"
+                            Style="{StaticResource AccentButton}"
+                            Content="Подключиться"
+                            MinWidth="150"
+                            Margin="0,0,8,0"
+                            Click="OnConnectClick" />
+                    <Button Style="{StaticResource BaseButton}"
+                            Content="Отмена"
+                            MinWidth="100"
+                            IsCancel="True"
+                            Click="OnCancelClick" />
+                </StackPanel>
+
+                <!-- Кнопка имитации: в рабочей системе Ключ 2 вводится на панели установки -->
+                <Button Style="{StaticResource BaseButton}"
+                        Content="Имитировать ввод Ключа 2 на панели"
+                        HorizontalAlignment="Left"
+                        Click="OnConfirmClick"
+                        Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVis}}" />
+            </DockPanel>
+        </Border>
+
+        <StackPanel>
+            <HeaderedContentControl Style="{StaticResource Card}">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Шаг 1. Адрес установки" />
+                </HeaderedContentControl.Header>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="110" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="IP-адрес" Style="{StaticResource MutedText}" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Порт" Style="{StaticResource MutedText}" Margin="8,0,0,0" />
+
+                    <TextBox Grid.Row="1" Grid.Column="0"
+                             Text="{Binding Address}"
+                             IsEnabled="{Binding CanEnterKey}"
+                             Margin="0,2,0,0" />
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             Text="{Binding Port}"
+                             IsEnabled="{Binding CanEnterKey}"
+                             Margin="8,2,0,0" />
+                </Grid>
+            </HeaderedContentControl>
+
+            <HeaderedContentControl Style="{StaticResource Card}" Margin="0,10,0,0">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Шаг 2. Ключ 1 — право доступа" />
+                </HeaderedContentControl.Header>
+
+                <StackPanel>
+                    <PasswordBox x:Name="Key1Box" IsEnabled="{Binding CanEnterKey}" />
+                    <TextBlock Text="Ключ 1 не передаётся по сети в открытом виде. Число неудачных попыток ограничено: после превышения подключения временно блокируются."
+                               Style="{StaticResource MutedText}"
+                               TextWrapping="Wrap"
+                               Margin="0,6,0,0" />
+                </StackPanel>
+            </HeaderedContentControl>
+
+            <HeaderedContentControl Style="{StaticResource Card}" Margin="0,10,0,0">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Шаг 3. Ключ 2 — подтверждение присутствия" />
+                </HeaderedContentControl.Header>
+
+                <StackPanel>
+                    <TextBlock Text="{Binding Key2Hint}"
+                               Style="{StaticResource MutedText}"
+                               TextWrapping="Wrap" />
+
+                    <Border Margin="0,10,0,0"
+                            Padding="10,8"
+                            Background="{StaticResource WarningSoftBrush}"
+                            BorderBrush="{StaticResource WarningBrush}"
+                            BorderThickness="1"
+                            Visibility="{Binding IsWaiting, Converter={StaticResource BoolToVis}}">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right"
+                                           Text="{Binding RemainingText}"
+                                           Style="{StaticResource BaseText}"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="Ожидание ввода Ключа 2 на панели установки"
+                                           Style="{StaticResource BaseText}"
+                                           FontWeight="SemiBold" />
+                            </DockPanel>
+                            <ProgressBar Value="{Binding RemainingSeconds, Mode=OneWay}"
+                                         Maximum="{Binding TimeoutSeconds}"
+                                         Margin="0,8,0,0" />
+                            <TextBlock Text="По истечении времени запрос отклоняется и процедуру требуется начать заново."
+                                       Style="{StaticResource MutedText}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,6,0,0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </HeaderedContentControl>
+
+            <Border Margin="0,10,0,0" Padding="10,8">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Background" Value="{StaticResource AccentSoftBrush}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsError}" Value="True">
+                                <Setter Property="Background" Value="{StaticResource AlarmSoftBrush}" />
+                                <Setter Property="BorderBrush" Value="{StaticResource AlarmBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <StackPanel>
+                    <TextBlock Text="{Binding StateText}" Style="{StaticResource BaseText}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Message}"
+                               Style="{StaticResource BaseText}"
+                               TextWrapping="Wrap"
+                               Margin="0,3,0,0" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </DockPanel>
+</Window>

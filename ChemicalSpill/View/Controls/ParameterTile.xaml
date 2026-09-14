@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="ChemicalSpill.View.Controls.ParameterTile"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmi="clr-namespace:ChemicalSpill.ViewModels.Items"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vmi:ParameterItemViewModel}">
+
+    <!-- Плитка параметра: наименование, значение, единица измерения, тип величины
+         и действующая уставка. Подсказка содержит назначение параметра. -->
+    <Border Background="{StaticResource PanelBrush}"
+            BorderBrush="{StaticResource BorderBrushLight}"
+            BorderThickness="1"
+            Margin="0,0,6,6"
+            MinHeight="84"
+            SnapsToDevicePixels="True"
+            ToolTipService.ShowDuration="30000"
+            ToolTip="{Binding ToolTipText}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Полоса оценки значения: норма, предупреждение, авария -->
+            <Border Grid.Column="0"
+                    Background="{Binding Status, Converter={StaticResource StatusBrush}}" />
+
+            <StackPanel Grid.Column="1" Margin="8,6">
+                <DockPanel>
+                    <Border DockPanel.Dock="Right" Style="{StaticResource Badge}" Margin="4,0,0,0">
+                        <TextBlock Text="{Binding KindText}" Style="{StaticResource BadgeText}" />
+                    </Border>
+                    <TextBlock Text="{Binding Caption}"
+                               Style="{StaticResource CaptionText}"
+                               TextTrimming="CharacterEllipsis" />
+                </DockPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <TextBlock Text="{Binding ValueText}"
+                               Style="{StaticResource BaseText}"
+                               FontSize="20"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Unit}"
+                               Style="{StaticResource BaseText}"
+                               FontSize="11"
+                               Margin="4,0,0,2"
+                               VerticalAlignment="Bottom"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Visibility="{Binding HasUnit, Converter={StaticResource BoolToVis}}" />
+                </StackPanel>
+
+                <TextBlock Text="{Binding LimitText}"
+                           Style="{StaticResource MutedText}"
+                           TextTrimming="CharacterEllipsis"
+                           Margin="0,3,0,0"
+                           Visibility="{Binding HasLimit, Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

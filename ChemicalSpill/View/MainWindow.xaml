@@ -1,0 +1,239 @@
+﻿<Window x:Class="ChemicalSpill.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:ChemicalSpill.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:ShellViewModel}"
+        Title="{Binding WindowTitle}"
+        Width="1600" Height="900"
+        MinWidth="1280" MinHeight="760"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Background="{StaticResource AppBackgroundBrush}"
+        FontFamily="{StaticResource UiFont}"
+        UseLayoutRounding="True">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="30"
+                      ResizeBorderThickness="6"
+                      CornerRadius="0"
+                      GlassFrameThickness="0"
+                      UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <!-- Меню верхней панели -->
+        <Style x:Key="ChromeMenu" TargetType="Menu">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource TextInverseBrush}" />
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        </Style>
+
+        <Style x:Key="ChromeMenuItem" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource TextInverseBrush}" />
+            <Setter Property="Padding" Value="10,6" />
+        </Style>
+    </Window.Resources>
+
+    <Border x:Name="RootBorder" BorderBrush="{StaticResource BorderBrushStrong}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="26" />
+            </Grid.RowDefinitions>
+
+            <!-- ============================================================
+                 Верхняя панель: меню и кнопки управления окном
+                 ============================================================ -->
+            <Border Grid.Row="0" Background="{StaticResource ChromeBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="ДОЗ-01"
+                               FontWeight="Bold"
+                               FontSize="12"
+                               Margin="12,0,10,0"
+                               VerticalAlignment="Center"
+                               Foreground="#7FB6DC" />
+
+                    <Menu Grid.Column="1" Style="{StaticResource ChromeMenu}">
+                        <MenuItem Header="Файл" Style="{StaticResource ChromeMenuItem}">
+                            <MenuItem Header="Загрузить рецепт…" Command="{Binding LoadRecipeCommand}" />
+                            <MenuItem Header="Отчёт о партии…" Command="{Binding ExportReportCommand}" />
+                            <MenuItem Header="Выгрузить журнал…" Command="{Binding ExportJournalCommand}" />
+                            <Separator />
+                            <MenuItem Header="Выход" Click="OnExitClick" />
+                        </MenuItem>
+
+                        <MenuItem Header="Вид" Style="{StaticResource ChromeMenuItem}">
+                            <MenuItem Header="Мнемосхема: переключить вид по станциям / по флакону"
+                                      Command="{Binding ToggleMnemonicCommand}" />
+                            <Separator />
+                            <MenuItem Header="Полноэкранный режим" Click="OnFullScreenClick" />
+                        </MenuItem>
+
+                        <MenuItem Header="Соединение" Style="{StaticResource ChromeMenuItem}">
+                            <MenuItem Header="Подключиться к установке…" Command="{Binding ConnectCommand}" />
+                            <MenuItem Header="Разорвать соединение" Command="{Binding DisconnectCommand}" />
+                            <Separator />
+                            <MenuItem Header="Параметры сети"
+                                      Command="{Binding SelectSectionCommand}"
+                                      CommandParameter="{Binding Sections[5]}" />
+                        </MenuItem>
+
+                        <MenuItem Header="Сервис" Style="{StaticResource ChromeMenuItem}">
+                            <MenuItem Header="Настройки цикла"
+                                      Command="{Binding SelectSectionCommand}"
+                                      CommandParameter="{Binding Sections[2]}" />
+                            <MenuItem Header="Рецепты"
+                                      Command="{Binding SelectSectionCommand}"
+                                      CommandParameter="{Binding Sections[3]}" />
+                            <Separator />
+                            <MenuItem Header="Имитация аварии (демонстрация)"
+                                      Command="{Binding SimulateAlarmCommand}"
+                                      Visibility="{Binding IsDemoMode, Converter={StaticResource BoolToVis}}" />
+                        </MenuItem>
+
+                        <MenuItem Header="Справка" Style="{StaticResource ChromeMenuItem}">
+                            <MenuItem Header="О программе" Command="{Binding AboutCommand}" />
+                        </MenuItem>
+                    </Menu>
+
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding WindowTitle}"
+                               FontSize="11"
+                               Margin="16,0"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               Foreground="#9BA6B4" />
+
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <Button Style="{StaticResource TitleBarButton}" Content="&#x2013;"
+                                ToolTip="Свернуть" Click="OnMinimizeClick" />
+                        <Button x:Name="MaximizeButton" Style="{StaticResource TitleBarButton}" Content="&#x25A1;"
+                                ToolTip="Развернуть" Click="OnMaximizeClick" />
+                        <Button Style="{StaticResource CloseBarButton}" Content="&#x2715;"
+                                ToolTip="Закрыть" Click="OnCloseClick" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ============================================================
+                 Боковое меню разделов и область содержимого
+                 ============================================================ -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="214" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="{StaticResource SidebarBrush}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Bottom" Padding="14,10" Background="#1F2833">
+                            <StackPanel>
+                                <TextBlock Text="Оператор" FontSize="10" Foreground="#7E8A99" />
+                                <TextBlock Text="{Binding OperatorText}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextInverseBrush}"
+                                           Margin="0,2,0,0" />
+                                <TextBlock Text="Демонстрационные данные"
+                                           FontSize="10"
+                                           Margin="0,8,0,0"
+                                           Foreground="#C58200"
+                                           Visibility="{Binding IsDemoMode, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
+                        </Border>
+
+                        <ListBox Style="{StaticResource SidebarList}"
+                                 ItemsSource="{Binding Sections}"
+                                 SelectedItem="{Binding CurrentSection}"
+                                 Margin="0,8,0,0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Glyph}"
+                                                   FontSize="13"
+                                                   Width="22"
+                                                   Foreground="#9BB4C9"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Title}"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextInverseBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+
+                <ContentControl Grid.Column="1"
+                                Margin="10"
+                                Content="{Binding CurrentSection.Content}" />
+            </Grid>
+
+            <!-- ============================================================
+                 Строка состояния: видна постоянно (п. 4.4)
+                 ============================================================ -->
+            <Border Grid.Row="2" Background="{StaticResource ChromeBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                        <Ellipse Width="9" Height="9"
+                                 Margin="0,0,6,0"
+                                 Fill="{Binding State, Converter={StaticResource MachineStateBrush}}" />
+                        <TextBlock Text="{Binding StateText}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextInverseBrush}"
+                                   VerticalAlignment="Center" />
+                        <Border Width="1" Background="#3A4553" Margin="10,4" />
+                        <TextBlock Text="{Binding ModeText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <Border Width="1" Background="#3A4553" Margin="10,4" />
+                        <TextBlock Text="{Binding StepText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding RecipeText}" FontSize="11" Foreground="#DCE3EB" VerticalAlignment="Center" />
+                        <Border Width="1" Background="#3A4553" Margin="10,4" />
+                        <TextBlock Text="{Binding BatchText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <Border Width="1" Background="#3A4553" Margin="10,4" />
+                        <TextBlock Text="{Binding ElapsedText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <Border Width="1" Background="#3A4553" Margin="10,4" />
+                        <TextBlock Text="{Binding RemainingText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                        <TextBlock Text="{Binding MemoryText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                        <Border Width="1" Background="#3A4553" Margin="10,4" />
+                        <Ellipse Width="9" Height="9"
+                                 Margin="0,0,6,0"
+                                 Fill="{Binding IsLinkOk, Converter={StaticResource BoolBrush}, ConverterParameter=warning}" />
+                        <TextBlock Text="{Binding LinkText}" FontSize="11" Foreground="#DCE3EB" VerticalAlignment="Center" />
+                        <Border Width="1" Background="#3A4553" Margin="10,4" />
+                        <TextBlock Text="{Binding ClockText}" FontSize="11" Foreground="#B4BECB" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,25 @@
+# Результаты сборки
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.dll
+*.exe
+*.pdb
+
+# Файлы Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+
+# ReSharper и прочие средства
+_ReSharper*/
+*.DotSettings.user
+
+# Служебные файлы ОС
+Thumbs.db
+desktop.ini

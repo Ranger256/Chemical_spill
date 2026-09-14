@@ -1,0 +1,163 @@
+﻿<Window x:Class="ChemicalSpill.View.Dialogs.RecipeSelectDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vmd="clr-namespace:ChemicalSpill.ViewModels.Dialogs"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vmd:RecipeSelectViewModel}"
+        Title="Выбор рецепта"
+        Width="980" Height="640"
+        MinWidth="820" MinHeight="520"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontFamily="{StaticResource UiFont}"
+        Background="{StaticResource AppBackgroundBrush}"
+        UseLayoutRounding="True">
+
+    <DockPanel Margin="12">
+        <!-- Заголовок -->
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+            <TextBlock Text="Выбор рецепта" Style="{StaticResource HeaderText}" />
+            <TextBlock Text="{Binding CurrentText}" Style="{StaticResource MutedText}" Margin="0,2,0,0" />
+            <TextBlock Text="{Binding ChangeHint}"
+                       Style="{StaticResource BaseText}"
+                       FontWeight="SemiBold"
+                       Foreground="{Binding IsChangeAllowed, Converter={StaticResource BoolBrush}}"
+                       Margin="0,6,0,0" />
+        </StackPanel>
+
+        <!-- Кнопки -->
+        <Border DockPanel.Dock="Bottom"
+                Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource BorderBrushLight}"
+                BorderThickness="1"
+                Padding="10"
+                Margin="0,10,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Style="{StaticResource BaseButton}"
+                            Content="Проверить соответствие"
+                            Command="{Binding CheckCommand}"
+                            Margin="0,0,8,0" />
+                    <Button Style="{StaticResource AccentButton}"
+                            Content="Загрузить рецепт"
+                            MinWidth="160"
+                            Command="{Binding LoadCommand}"
+                            Margin="0,0,8,0" />
+                    <Button Style="{StaticResource BaseButton}"
+                            Content="Отмена"
+                            MinWidth="100"
+                            IsCancel="True" />
+                </StackPanel>
+
+                <CheckBox Content="Показывать архивные рецепты"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding ShowArchived}" />
+            </DockPanel>
+        </Border>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="330" />
+            </Grid.ColumnDefinitions>
+
+            <HeaderedContentControl Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,8,0">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Доступные рецепты" />
+                </HeaderedContentControl.Header>
+
+                <DataGrid Style="{StaticResource DataTable}"
+                          ItemsSource="{Binding Items}"
+                          SelectedItem="{Binding Selected}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="2*" MinWidth="150" />
+                        <DataGridTextColumn Header="Версия" Binding="{Binding Version}" Width="55" />
+                        <DataGridTemplateColumn Header="Состояние" Width="110">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Margin="6,2" CornerRadius="2" Padding="6,1"
+                                            HorizontalAlignment="Left"
+                                            Background="{Binding State, Converter={StaticResource RecipeStateBrush}}">
+                                        <TextBlock Text="{Binding StateText}"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White" />
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Продукт" Binding="{Binding Product}" Width="1.6*" MinWidth="130" />
+                        <DataGridTextColumn Header="Тара" Binding="{Binding VialText}" Width="62" />
+                        <DataGridTextColumn Header="Доза" Binding="{Binding DoseText}" Width="76" />
+                        <DataGridTextColumn Header="Изменён" Binding="{Binding ModifiedText}" Width="112" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </HeaderedContentControl>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <HeaderedContentControl Grid.Row="0" Style="{StaticResource Card}">
+                    <HeaderedContentControl.Header>
+                        <TextBlock Text="Выбранный рецепт" />
+                    </HeaderedContentControl.Header>
+
+                    <StackPanel>
+                        <TextBlock Text="{Binding SummaryText}"
+                                   Style="{StaticResource BaseText}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding StateHint}"
+                                   Style="{StaticResource MutedText}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8,0,0" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Grid.Row="1" Style="{StaticResource Card}" Margin="0,8,0,0">
+                    <HeaderedContentControl.Header>
+                        <TextBlock Text="Проверка соответствия установке" />
+                    </HeaderedContentControl.Header>
+
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top"
+                                   Text="Результат выводится перечнем выполненных и невыполненных условий, а не одним общим сообщением об ошибке."
+                                   Style="{StaticResource MutedText}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8" />
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Checks}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,0,0,6">
+                                            <TextBlock DockPanel.Dock="Left"
+                                                       Text="{Binding Glyph}"
+                                                       Width="16"
+                                                       FontWeight="Bold"
+                                                       VerticalAlignment="Top"
+                                                       Foreground="{Binding Passed, Converter={StaticResource BoolBrush}}" />
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Text}"
+                                                           Style="{StaticResource BaseText}"
+                                                           TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding Detail}"
+                                                           Style="{StaticResource MutedText}"
+                                                           TextWrapping="Wrap"
+                                                           Visibility="{Binding HasDetail, Converter={StaticResource BoolToVis}}" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                </HeaderedContentControl>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

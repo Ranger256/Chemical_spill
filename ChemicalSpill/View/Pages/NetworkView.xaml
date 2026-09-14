@@ -1,0 +1,311 @@
+﻿<UserControl x:Class="ChemicalSpill.View.Pages.NetworkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vms="clr-namespace:ChemicalSpill.ViewModels.Sections"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vms:NetworkViewModel}"
+             d:DesignWidth="1360" d:DesignHeight="820">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Физическое подключение и адресация -->
+        <Grid Grid.Column="0" Margin="0,0,8,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <HeaderedContentControl Grid.Row="0" Style="{StaticResource Card}">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Физическое подключение" />
+                </HeaderedContentControl.Header>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Ellipse Width="11" Height="11"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,8,0"
+                                 Fill="{Binding LinkUp, Converter={StaticResource BoolBrush}}" />
+                        <TextBlock Style="{StaticResource SubheadText}">
+                            <Run Text="Соединение: " />
+                            <Run Text="{Binding LinkText, Mode=OneWay}" />
+                        </TextBlock>
+                    </StackPanel>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Скорость соединения" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SpeedText}" Style="{StaticResource BaseText}" Margin="0,2" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Режим передачи" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DuplexText}" Style="{StaticResource BaseText}" Margin="0,2" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="MAC-адрес" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding MacText}" Style="{StaticResource MonoText}" Margin="0,2" />
+                    </Grid>
+
+                    <TextBlock Text="{Binding PhysicalHint}"
+                               Style="{StaticResource MutedText}"
+                               TextWrapping="Wrap"
+                               Margin="0,10,0,0" />
+                </StackPanel>
+            </HeaderedContentControl>
+
+            <HeaderedContentControl Grid.Row="1" Style="{StaticResource Card}" Margin="0,8,0,0">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Адресация" />
+                </HeaderedContentControl.Header>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <RadioButton Style="{StaticResource SegmentButton}"
+                                     GroupName="AddressMode"
+                                     Content="DHCP"
+                                     IsChecked="{Binding IsDhcp}" />
+                        <RadioButton Style="{StaticResource SegmentButton}"
+                                     GroupName="AddressMode"
+                                     Content="Вручную"
+                                     IsChecked="{Binding IsManual}" />
+                    </StackPanel>
+
+                    <TextBlock Text="IP-адрес" Style="{StaticResource MutedText}" />
+                    <TextBox Text="{Binding IpAddress}" IsEnabled="{Binding IsManual}" Margin="0,2,0,8" />
+
+                    <TextBlock Text="Маска подсети" Style="{StaticResource MutedText}" />
+                    <TextBox Text="{Binding SubnetMask}" IsEnabled="{Binding IsManual}" Margin="0,2,0,8" />
+
+                    <TextBlock Text="Шлюз" Style="{StaticResource MutedText}" />
+                    <TextBox Text="{Binding Gateway}" IsEnabled="{Binding IsManual}" Margin="0,2,0,8" />
+
+                    <TextBlock Text="Порт" Style="{StaticResource MutedText}" />
+                    <TextBox Text="{Binding Port}" Margin="0,2,0,10" />
+
+                    <Button Style="{StaticResource AccentButton}"
+                            Content="Применить параметры"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding ApplyAddressingCommand}" />
+
+                    <TextBlock Text="Поддерживаются прямое соединение «установка – ПК» с заданными вручную адресами и подключение к локальной сети предприятия через коммутатор."
+                               Style="{StaticResource MutedText}"
+                               TextWrapping="Wrap"
+                               Margin="0,10,0,0" />
+                </StackPanel>
+            </HeaderedContentControl>
+        </Grid>
+
+        <!-- Процедура подключения -->
+        <HeaderedContentControl Grid.Column="1" Style="{StaticResource Card}" Margin="0,0,8,0">
+            <HeaderedContentControl.Header>
+                <DockPanel>
+                    <Ellipse DockPanel.Dock="Right"
+                             Width="10" Height="10"
+                             VerticalAlignment="Center"
+                             Fill="{Binding IsConnected, Converter={StaticResource BoolBrush}, ConverterParameter=warning}" />
+                    <TextBlock Text="Соединение с установкой" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                </DockPanel>
+            </HeaderedContentControl.Header>
+
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top">
+                    <TextBlock Text="{Binding LinkStateText}" Style="{StaticResource SubheadText}" />
+
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Подключённый клиент" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ClientText}" Style="{StaticResource BaseText}" Margin="0,2" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Подключён с" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ConnectedSinceText}" Style="{StaticResource BaseText}" Margin="0,2" />
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Style="{StaticResource AccentButton}"
+                                Content="Подключиться…"
+                                Command="{Binding ConnectCommand}"
+                                Margin="0,0,6,0" />
+                        <Button Style="{StaticResource BaseButton}"
+                                Content="Разорвать соединение"
+                                Command="{Binding DisconnectCommand}" />
+                    </StackPanel>
+
+                    <Separator />
+
+                    <TextBlock Text="Порядок установления соединения"
+                               Style="{StaticResource BaseText}"
+                               FontWeight="SemiBold"
+                               Margin="0,4,0,6" />
+                </StackPanel>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Steps}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,4" Padding="8,6">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Setter Property="Background" Value="{StaticResource PanelHeaderBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushLight}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDone}" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource OkSoftBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{StaticResource OkBrush}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{StaticResource WarningBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+
+                                    <DockPanel>
+                                        <Border DockPanel.Dock="Left"
+                                                Width="22" Height="22"
+                                                CornerRadius="11"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Top"
+                                                Background="{Binding IsDone, Converter={StaticResource BoolBrush}, ConverterParameter=warning}">
+                                            <TextBlock Text="{Binding Number}"
+                                                       Foreground="White"
+                                                       FontSize="11"
+                                                       FontWeight="Bold"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Text="{Binding Text}"
+                                                   Style="{StaticResource BaseText}"
+                                                   TextWrapping="Wrap" />
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </HeaderedContentControl>
+
+        <!-- Качество канала и защита соединения -->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <HeaderedContentControl Grid.Row="0" Style="{StaticResource Card}">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Качество канала" />
+                </HeaderedContentControl.Header>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Задержка обмена" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LatencyText}" Style="{StaticResource BaseText}" Margin="0,2" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Счётчик ошибок" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ErrorsText}" Style="{StaticResource BaseText}" Margin="0,2" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Потери пакетов" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LostText}" Style="{StaticResource BaseText}" Margin="0,2" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Последний разрыв связи" Style="{StaticResource MutedText}" Margin="0,2,10,2" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding LastDisconnectText}" Style="{StaticResource BaseText}" Margin="0,2" />
+                </Grid>
+            </HeaderedContentControl>
+
+            <HeaderedContentControl Grid.Row="1" Style="{StaticResource Card}" Margin="0,8,0,0">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Защита соединения" />
+                </HeaderedContentControl.Header>
+
+                <StackPanel>
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding FailedAttemptsText}" Style="{StaticResource BaseText}" />
+                        <TextBlock Text="Неудачные попытки ввода Ключа 1" Style="{StaticResource MutedText}" />
+                    </DockPanel>
+
+                    <Border Margin="0,8,0,0" Padding="8,6"
+                            Background="{StaticResource AlarmSoftBrush}"
+                            BorderBrush="{StaticResource AlarmBrush}"
+                            BorderThickness="1"
+                            Visibility="{Binding IsBlocked, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="Подключения временно заблокированы после превышения числа неудачных попыток."
+                                   Style="{StaticResource CaptionText}"
+                                   TextWrapping="Wrap" />
+                    </Border>
+
+                    <TextBlock Text="{Binding SecurityHint}"
+                               Style="{StaticResource MutedText}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0" />
+                </StackPanel>
+            </HeaderedContentControl>
+
+            <HeaderedContentControl Grid.Row="2" Style="{StaticResource Card}" Margin="0,8,0,0">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Разграничение управления" />
+                </HeaderedContentControl.Header>
+
+                <StackPanel>
+                    <TextBlock Text="{Binding PriorityHint}"
+                               Style="{StaticResource CaptionText}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10" />
+                    <TextBlock Text="{Binding LinkLossHint}"
+                               Style="{StaticResource CaptionText}"
+                               TextWrapping="Wrap" />
+
+                    <Border Margin="0,10,0,0" Padding="8,6"
+                            Background="{StaticResource PanelHeaderBrush}"
+                            BorderBrush="{StaticResource BorderBrushLight}"
+                            BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="Память журнала установки" Style="{StaticResource BaseText}" FontWeight="SemiBold" />
+                            <ProgressBar Value="{Binding MemoryPercent, Mode=OneWay}" Maximum="100" Margin="0,6,0,0" />
+                            <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0">
+                                <Run Text="Заполнено " />
+                                <Run Text="{Binding MemoryPercent, Mode=OneWay}" />
+                                <Run Text=" %. Глубина хранения — не менее 30 суток непрерывной работы или 50 партий." />
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </HeaderedContentControl>
+        </Grid>
+    </Grid>
+</UserControl>

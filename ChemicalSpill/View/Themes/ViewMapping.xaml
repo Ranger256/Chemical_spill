@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:pages="clr-namespace:ChemicalSpill.View.Pages"
+                    xmlns:vmm="clr-namespace:ChemicalSpill.ViewModels.Main"
+                    xmlns:vms="clr-namespace:ChemicalSpill.ViewModels.Sections">
+
+    <!-- ================================================================
+         Сопоставление моделей представления с разметкой.
+         Оболочка выводит CurrentSection.Content, а нужный экран подбирается
+         по типу модели: добавление раздела не требует правки оболочки.
+         ================================================================ -->
+
+    <DataTemplate DataType="{x:Type vmm:MainScreenViewModel}">
+        <pages:MainScreenView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vms:ParametersViewModel}">
+        <pages:ParametersView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vms:CycleSettingsViewModel}">
+        <pages:CycleSettingsView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vms:RecipesViewModel}">
+        <pages:RecipesView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vms:JournalViewModel}">
+        <pages:JournalView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vms:NetworkViewModel}">
+        <pages:NetworkView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vms:VideoViewModel}">
+        <pages:VideoView />
+    </DataTemplate>
+
+</ResourceDictionary>

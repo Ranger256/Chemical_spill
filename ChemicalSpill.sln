@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.37327.17
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemicalSpill", "ChemicalSpill\ChemicalSpill.csproj", "{910B6B5E-5856-4C58-866E-B6BF38CE1EEC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{910B6B5E-5856-4C58-866E-B6BF38CE1EEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{910B6B5E-5856-4C58-866E-B6BF38CE1EEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{910B6B5E-5856-4C58-866E-B6BF38CE1EEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{910B6B5E-5856-4C58-866E-B6BF38CE1EEC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1252E149-7A02-4939-B5DF-D1EFF92C20A6}
+	EndGlobalSection
+EndGlobal
